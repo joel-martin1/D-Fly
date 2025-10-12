@@ -40,14 +40,12 @@ public class VentanaFinal extends JFrame {
         setSize(500, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        getContentPane().setLayout(null);  // Para posicionamiento absoluto como en el Design
+        getContentPane().setLayout(null); 
 
-        // ---- TÍTULO ----
         JLabel titulo = new JLabel("RESERVA Y PAGO");
         titulo.setBounds(20, 10, 300, 20);
         getContentPane().add(titulo);
 
-        // ---- SELECCIÓN EXTRAS ----
         JLabel extrasLabel = new JLabel("Selección Extras");
         extrasLabel.setBounds(20, 50, 150, 20);
         getContentPane().add(extrasLabel);
@@ -60,7 +58,6 @@ public class VentanaFinal extends JFrame {
         seguro.setBounds(20, 110, 150, 20);
         getContentPane().add(seguro);
 
-        // ---- RESUMEN Y PAGO ----
         JLabel resumenLabel = new JLabel("Resumen y Pago");
         resumenLabel.setBounds(250, 50, 150, 20);
         getContentPane().add(resumenLabel);
@@ -101,7 +98,6 @@ public class VentanaFinal extends JFrame {
         fechaField.setBounds(310, 235, 100, 25);
         getContentPane().add(fechaField);
 
-        // ---- BOTÓN ----
         JButton confirmar = new JButton("Confirmar y Pagar");
         confirmar.setBounds(161, 300, 189, 30);
         getContentPane().add(confirmar);
@@ -109,3 +105,4 @@ public class VentanaFinal extends JFrame {
 
    
 }
+
