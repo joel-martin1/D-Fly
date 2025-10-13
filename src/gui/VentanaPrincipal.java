@@ -9,7 +9,7 @@ public class VentanaPrincipal extends JFrame {
 
     public VentanaPrincipal() {
         //Configuración básica
-        super("D-Fly - Búsqueda de Vuelos"); 
+        setTitle("D-Fly - Búsqueda de Vuelos"); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         setSize(550, 350); 
         setLocationRelativeTo(null); 
@@ -77,18 +77,24 @@ public class VentanaPrincipal extends JFrame {
         add(panelInferior, BorderLayout.SOUTH); 
 
         // Funcion botones
-
-        btnLogin.addActionListener(e -> {
-            System.out.println("Botón 'Iniciar Sesión' pulsado.");
-            JOptionPane.showMessageDialog(this, "Aquí se abriría la ventana de Login/Registro.", "Info", JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        btnBuscar.addActionListener(e -> {
-            String origen = txtOrigen.getText();
-            String destino = txtDestino.getText();
-            System.out.println("Buscando vuelos de " + origen + " a " + destino + "...");
-            JOptionPane.showMessageDialog(this, "Buscando vuelos... ¡Aquí se abriría la ventana de resultados!", "Búsqueda", JOptionPane.INFORMATION_MESSAGE);
-        });
+        	
+        btnLogin.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(panelFormulario, "Aqui se abrirá la ventana de login");
+				
+			}
+		});
+        
+        btnBuscar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(panelFormulario, "Aquí se abrira la siguente ventana de busqueda de vuelos");
+				
+			}
+		});
     }
 
 
