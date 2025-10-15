@@ -104,7 +104,6 @@ public class VentanaPrincipal extends JFrame {
         btnBuscar.setFont(new Font("Segoe UI", Font.BOLD, 18));
         btnBuscar.setBackground(UIConstants.DFLY);
         btnBuscar.setForeground(Color.WHITE);
-        btnBuscar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnBuscar.setPreferredSize(new Dimension(200, 50));
 
         JPanel panelBotonBusqueda = new JPanel();
