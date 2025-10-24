@@ -1,117 +1,156 @@
 package gui;
 
+import util.UIConstants; //Importamos colores
+
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
-import util.UIConstants;
-
+import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.net.URL;
 
 public class VentanaPrincipal extends JFrame {
 
     public VentanaPrincipal() {
-        //Configuración básica
-        setTitle("D-Fly - Búsqueda de Vuelos"); 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-        setSize(950, 700); 
-        setLocationRelativeTo(null); 
-        setLayout(new BorderLayout(10, 10)); 
+        setTitle("D-Fly");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //setSize(1000, 700);
+        setSize(getMaximumSize()); //Quiero que se abra en fullscreen
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
         
-        // Cabecera
+        getContentPane().setBackground(Color.WHITE); //Planeado que el fondo sea la foto de un avión
+
+        JPanel panelSuperiorCompleto = new JPanel();
+        panelSuperiorCompleto.setLayout(new BoxLayout(panelSuperiorCompleto, BoxLayout.Y_AXIS)); //Un panel encima del otro
+
+        //Cabecera (Logo + Icono Sesión)
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(UIConstants.DFLY);
+        headerPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
         
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(UIConstants.DFLY);
-        header.setBorder(new EmptyBorder(10,20,10,20));
-        
+        //Logo
         JLabel logoLabel = new JLabel();
-        
         try {
-        	URL imageURL = getClass().getResource("/resources/LogoDFly_Morado.png");
-        	if(imageURL != null) {
-        		ImageIcon originalIcon = new ImageIcon(imageURL);
-        		Image originalImage = originalIcon.getImage();
-        		Image resizedImage = originalImage.getScaledInstance(120, -1, Image.SCALE_SMOOTH);
-        		logoLabel.setIcon(new ImageIcon(resizedImage));
-        	}else {
-        		logoLabel.setText("D-Fly");
-        		logoLabel.setForeground(Color.WHITE);
-        		logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
+            URL imageUrl = getClass().getResource("/resources/LogoDFly_Morado.png");
+            if (imageUrl != null) {
+                ImageIcon originalIcon = new ImageIcon(imageUrl);
+                Image originalImage = originalIcon.getImage();
+                Image resizedImage = originalImage.getScaledInstance(120, -1, Image.SCALE_SMOOTH); 
+                logoLabel.setIcon(new ImageIcon(resizedImage));
+            } else {
+                logoLabel.setText("D-Fly");
+                logoLabel.setForeground(Color.WHITE);
+                logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        headerPanel.add(logoLabel, BorderLayout.WEST);
+
+        //LogIn
+        JPanel panelIconoLogin = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        panelIconoLogin.setOpaque(false);
+        JButton btnIconoLogin = new JButton();
+        try {
+            URL iconUrl = getClass().getResource("/resources/user_icon.png");
+            if (iconUrl != null) {
+                ImageIcon userIcon = new ImageIcon(iconUrl);
+                Image img = userIcon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+                btnIconoLogin.setIcon(new ImageIcon(img));
+            } else { btnIconoLogin.setText("SESIÓN");
+            		 btnIconoLogin.setForeground(Color.WHITE);}
+        } catch (Exception e) { //Este catch solo esta puesto porque tiene que haber uno despues de un "try", no porque sirva para algo...
+        	btnIconoLogin.setText("SESIÓN");
+        	btnIconoLogin.setForeground(Color.WHITE);
         	}
-        	
-        	
-        }catch (Exception e){
-        	e.printStackTrace();
-        	
+        
+        btnIconoLogin.setOpaque(false);
+        btnIconoLogin.setContentAreaFilled(false);
+        btnIconoLogin.setBorderPainted(false);
+        btnIconoLogin.setFocusPainted(false);
+        btnIconoLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        btnIconoLogin.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Aquí se abriría la ventana de Login/Registro");
+        });
+        
+        panelIconoLogin.add(btnIconoLogin);
+        headerPanel.add(panelIconoLogin, BorderLayout.EAST);
+
+        //Navegación y Búsqueda
+        JPanel searchPanelCompleto = new JPanel(new BorderLayout());
+        searchPanelCompleto.setBackground(UIConstants.DFLY);
+        
+        Border lineaSuperior = BorderFactory.createMatteBorder(10, 0, 0, 0, Color.WHITE);
+        Border padding = new EmptyBorder(10, 20, 15, 20);
+        searchPanelCompleto.setBorder(BorderFactory.createCompoundBorder(lineaSuperior, padding));
+
+        //Pestañas (Alojamiento, Vuelo, Aloj + Vuelo)
+        JPanel panelPestanas = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        panelPestanas.setOpaque(false);
+        JRadioButton rbVuelo = new JRadioButton("Vuelo");
+        JRadioButton rbAlojamiento = new JRadioButton("Alojamiento");
+        JRadioButton rbAlojVuelo = new JRadioButton("Alojamiento + Vuelo");
+        
+        ButtonGroup groupPestanas = new ButtonGroup(); //Esto es para que solo se pueda seleccionar uno
+        groupPestanas.add(rbVuelo);
+        groupPestanas.add(rbAlojamiento);
+        groupPestanas.add(rbAlojVuelo);
+
+        for (JRadioButton rb : new JRadioButton[]{rbVuelo, rbAlojamiento, rbAlojVuelo}) {
+            rb.setForeground(Color.WHITE);
+            rb.setOpaque(false);
+            rb.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            rb.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            panelPestanas.add(rb);
         }
-        header.add(logoLabel, BorderLayout.WEST);
+        rbVuelo.setSelected(true); //Dejar "Vuelo" seleccionado por defecto
         
-        //Botones reg y login
-        JPanel btnPanel = new JPanel();
-        btnPanel.setOpaque(false);
+        searchPanelCompleto.add(panelPestanas, BorderLayout.NORTH);
+
+        //Formulario de búsqueda horizontal (Ubicación, Fecha, Nº Per)
+        JPanel panelFormulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        panelFormulario.setOpaque(false);
+
+        JTextField txtUbicacion = new JTextField(25);
+        JTextField txtFecha = new JTextField(12); //Esto será un boton en el cual se abrirá un calendario para escoger fechas
+        JSpinner spinnerPersonas = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+        JButton btnBuscar = new JButton("Buscar");
+
+        btnBuscar.setBackground(Color.WHITE);
+        btnBuscar.setForeground(UIConstants.DFLY);
+        btnBuscar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnBuscar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        panelFormulario.add(new JLabel("Ubicación:")).setForeground(Color.WHITE);
+        panelFormulario.add(txtUbicacion);
+        panelFormulario.add(new JLabel("Fecha:")).setForeground(Color.WHITE);
+        panelFormulario.add(txtFecha);
+        panelFormulario.add(new JLabel("Nº Per:")).setForeground(Color.WHITE);
+        panelFormulario.add(spinnerPersonas);
+        panelFormulario.add(btnBuscar);
         
-        JButton btnReg = new JButton("Registrarse");
-        JButton btnLogin = new JButton("LogIn");
-        
-        btnPanel.add(btnLogin);
-        btnPanel.add(btnReg);
-        
-        header.add(btnPanel);
-        
-        add(header, BorderLayout.NORTH);
-        
-        //Paneles
+        searchPanelCompleto.add(panelFormulario, BorderLayout.CENTER);
 
-        JPanel panelCentral = new JPanel(new BorderLayout(10, 15));
-        panelCentral.setBorder(new EmptyBorder(40, 60, 40, 60));
+        panelSuperiorCompleto.add(headerPanel);
+        panelSuperiorCompleto.add(searchPanelCompleto);
 
-        JLabel lblTitulo = new JLabel("Busca tu próximo destino", SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 32));
-        panelCentral.add(lblTitulo, BorderLayout.NORTH);
+        add(panelSuperiorCompleto, BorderLayout.NORTH);
 
-        JPanel panelFormulario = new JPanel(new GridBagLayout());
-        panelFormulario.setBorder(BorderFactory.createTitledBorder("Detalles del Viaje"));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 8, 10, 8);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        panelFormulario.add(new JLabel("Origen:"), gbc);
-        gbc.gridx = 1;
-        panelFormulario.add(new JTextField(20), gbc);
-        gbc.gridx = 0; gbc.gridy = 1;
-        panelFormulario.add(new JLabel("Destino:"), gbc);
-        gbc.gridx = 1;
-        panelFormulario.add(new JTextField(20), gbc);
-        gbc.gridx = 0; gbc.gridy = 2;
-        panelFormulario.add(new JLabel("Fecha de Ida:"), gbc);
-        gbc.gridx = 1;
-        panelFormulario.add(new JTextField(20), gbc);
-        gbc.gridx = 0; gbc.gridy = 3;
-        panelFormulario.add(new JLabel("Fecha de Vuelta:"), gbc);
-        gbc.gridx = 1;
-        panelFormulario.add(new JTextField(20), gbc);
-        gbc.gridx = 0; gbc.gridy = 4;
-        panelFormulario.add(new JLabel("Pasajeros:"), gbc);
-        gbc.gridx = 1;
-        panelFormulario.add(new JSpinner(new SpinnerNumberModel(1, 1, 10, 1)), gbc);
+        //Panel de recomendados
+        JPanel mainContentPanel = new JPanel(new BorderLayout());
+        mainContentPanel.setBackground(Color.WHITE);
+        mainContentPanel.setBorder(new EmptyBorder(30, 30, 30, 30));
 
-        panelCentral.add(panelFormulario, BorderLayout.CENTER);
+        JLabel lblTituloDestinos = new JLabel("DESTINOS RECOMENDADOS");
+        lblTituloDestinos.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblTituloDestinos.setHorizontalAlignment(SwingConstants.CENTER);
+        mainContentPanel.add(lblTituloDestinos, BorderLayout.NORTH);
 
-        JButton btnBuscar = new JButton("Buscar Vuelos");
-        btnBuscar.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        btnBuscar.setBackground(UIConstants.DFLY);
-        btnBuscar.setForeground(Color.WHITE);
-        btnBuscar.setPreferredSize(new Dimension(200, 50));
+        JPanel panelPlaceholder = new JPanel();
+        panelPlaceholder.setBackground(new Color(235, 235, 235));
+        panelPlaceholder.setBorder(BorderFactory.createEtchedBorder());
+        panelPlaceholder.add(new JLabel("(Aquí irían los destinos recomendados)"));
+        mainContentPanel.add(panelPlaceholder, BorderLayout.CENTER);
 
-        JPanel panelBotonBusqueda = new JPanel();
-        panelBotonBusqueda.add(btnBuscar);
-        panelCentral.add(panelBotonBusqueda, BorderLayout.SOUTH);
-
-        add(panelCentral, BorderLayout.CENTER);
+        add(mainContentPanel, BorderLayout.CENTER);
     }
-
-
 }
