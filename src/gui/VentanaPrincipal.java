@@ -1,6 +1,6 @@
 package gui;
 
-import util.UIConstants; //Importamos colores
+import util.UIConstants; //Colores
 
 import javax.swing.*;
 import javax.swing.border.*;
