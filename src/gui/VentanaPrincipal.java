@@ -6,22 +6,23 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.net.URL;
+import java.time.Year;
 
 public class VentanaPrincipal extends JFrame {
 
     public VentanaPrincipal() {
         setTitle("D-Fly");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //setSize(1000, 700);
-        setSize(getMaximumSize()); //Quiero que se abra en fullscreen
+        setExtendedState(JFrame.MAXIMIZED_BOTH); //Fullscreen
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         
         getContentPane().setBackground(Color.WHITE); //Planeado que el fondo sea la foto de un avión
 
-        JPanel panelSuperiorCompleto = new JPanel();
-        panelSuperiorCompleto.setLayout(new BoxLayout(panelSuperiorCompleto, BoxLayout.Y_AXIS)); //Un panel encima del otro
-
+        JPanel panelSuperiorCompleto = new JPanel(new GridBagLayout()); 
+        GridBagConstraints gbcSuperior = new GridBagConstraints();
+        panelSuperiorCompleto.setBackground(Color.WHITE);
+        
         //Cabecera (Logo + Icono Sesión)
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UIConstants.DFLY);
@@ -110,7 +111,63 @@ public class VentanaPrincipal extends JFrame {
         panelFormulario.setOpaque(false);
 
         JTextField txtUbicacion = new JTextField(25);
-        JTextField txtFecha = new JTextField(12); //Esto será un boton en el cual se abrirá un calendario para escoger fechas
+        //JComboBox de Fecha Ida
+        JComboBox<Integer> cbmDiaIda = new JComboBox<Integer>(); 
+        JComboBox<String> cbmMesIda = new JComboBox<String>(); 
+        JComboBox<Integer> cbmAnioIda = new JComboBox<Integer>(); 
+        
+        for(int i=1; i<=31; i++) {
+        	cbmDiaIda.addItem(i); 
+        }
+        String[] meses = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
+        
+        for(String mes : meses) {
+        	cbmMesIda.addItem(mes); 
+        }
+        int anioActual = Year.now().getValue();
+        
+        for(int i=anioActual; i<=anioActual+5; i++) { //Limite de 5 años
+        	cbmAnioIda.addItem(i); 
+        }
+        
+        JPanel panelFechaIda = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 0)); 
+        panelFechaIda.setOpaque(false);
+        panelFechaIda.add(cbmDiaIda); 
+        panelFechaIda.add(cbmMesIda); 
+        panelFechaIda.add(cbmAnioIda); 
+        
+        JComboBox<Integer> cbmDiaVuelta = new JComboBox<Integer>();
+        JComboBox<String> cbmMesVuelta = new JComboBox<String>();
+        JComboBox<Integer> cbmAnioVuelta = new JComboBox<Integer>();
+        
+        for(int i=1; i<=31; i++) {
+        	cbmDiaVuelta.addItem(i);
+        }
+        for(String mes : meses) { 
+        	cbmMesVuelta.addItem(mes);
+        }
+        for(int i=anioActual; i<=anioActual+5; i++) { 
+        	cbmAnioVuelta.addItem(i);
+        }
+        
+        JPanel panelFechaVuelta = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 0));
+        panelFechaVuelta.setOpaque(false);
+        panelFechaVuelta.add(cbmDiaVuelta);
+        panelFechaVuelta.add(cbmMesVuelta);
+        panelFechaVuelta.add(cbmAnioVuelta);
+
+        JCheckBox chkSoloIda = new JCheckBox("Solo Ida");
+        chkSoloIda.setOpaque(false);
+        chkSoloIda.setForeground(Color.WHITE);
+        
+        chkSoloIda.addActionListener(e -> {
+            boolean soloIda = chkSoloIda.isSelected();
+            cbmDiaVuelta.setEnabled(!soloIda);
+            cbmMesVuelta.setEnabled(!soloIda);
+            cbmAnioVuelta.setEnabled(!soloIda);
+        });
+        
         JSpinner spinnerPersonas = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         JButton btnBuscar = new JButton("Buscar");
 
@@ -121,17 +178,40 @@ public class VentanaPrincipal extends JFrame {
 
         panelFormulario.add(new JLabel("Ubicación:")).setForeground(Color.WHITE);
         panelFormulario.add(txtUbicacion);
-        panelFormulario.add(new JLabel("Fecha:")).setForeground(Color.WHITE);
-        panelFormulario.add(txtFecha);
+        panelFormulario.add(new JLabel("Fecha de Ida:")).setForeground(Color.WHITE); 
+        panelFormulario.add(panelFechaIda); 
+        
+        panelFormulario.add(new JLabel("Fecha de Vuelta:")).setForeground(Color.WHITE);
+        panelFormulario.add(panelFechaVuelta);
+        panelFormulario.add(chkSoloIda);
+        
         panelFormulario.add(new JLabel("Nº Per:")).setForeground(Color.WHITE);
         panelFormulario.add(spinnerPersonas);
         panelFormulario.add(btnBuscar);
         
         searchPanelCompleto.add(panelFormulario, BorderLayout.CENTER);
 
-        panelSuperiorCompleto.add(headerPanel);
-        panelSuperiorCompleto.add(searchPanelCompleto);
+        /*
+         * Generado por Gemini AI
+         */
+        
+        //HeaderPanel 
+        gbcSuperior.gridy = 0;
+        gbcSuperior.weightx = 1.0; // Le dice que "crezca" para ocupar el ancho
+        gbcSuperior.fill = GridBagConstraints.HORIZONTAL; // Fuerza a rellenar horizontalmente
+        panelSuperiorCompleto.add(headerPanel, gbcSuperior);
 
+        //SearchPanelCompleto
+        gbcSuperior.gridy = 1;
+        gbcSuperior.weightx = 0; // No crece
+        gbcSuperior.fill = GridBagConstraints.NONE; //El tamaño va a ser dependiendo de lo que haya dentro
+        gbcSuperior.anchor = GridBagConstraints.CENTER; // Se centra en el espacio sobrante
+        panelSuperiorCompleto.add(searchPanelCompleto, gbcSuperior);
+   
+        /*
+         * Fin de Gemini AI
+         */
+        
         add(panelSuperiorCompleto, BorderLayout.NORTH);
 
 
