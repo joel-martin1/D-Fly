@@ -6,9 +6,12 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.Year;
+import java.util.Vector;
 
 public class VentanaPrincipal extends JFrame {
+	private Vector<String> mesesVector = new Vector<>();
 
     public VentanaPrincipal() {
         setTitle("D-Fly");
@@ -116,15 +119,33 @@ public class VentanaPrincipal extends JFrame {
         JComboBox<String> cbmMesIda = new JComboBox<String>(); 
         JComboBox<Integer> cbmAnioIda = new JComboBox<Integer>(); 
         
+        //Obtenemos el día actual
+        int diaActual = LocalDate.now().getDayOfMonth();
+        int mesActual= LocalDate.now().getMonthValue();
+        
+        //Rellenamos el JComboBox con todos los días
         for(int i=1; i<=31; i++) {
         	cbmDiaIda.addItem(i); 
         }
+        
+        //Establecemos el día actual como el valor seleccionado por defecto
+        cbmDiaIda.setSelectedItem(diaActual);
+
         String[] meses = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
                 "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
         
+        int mesActualIndex = LocalDate.now().getMonthValue();
+        String mesActualString = meses[mesActualIndex - 1]; //Porque el getMonthValue es del 1, y el vector desde el 0
+        
+        //Rellenamos el  Vector y el JComboBox
         for(String mes : meses) {
-        	cbmMesIda.addItem(mes); 
+            mesesVector.add(mes);   // Rellenamos el Vector
+        	cbmMesIda.addItem(mes); // Rellenamos el ComboBox
         }
+        
+        //Seleccionamos el mes actual por defecto
+        cbmMesIda.setSelectedItem(mesActualString);
+        
         int anioActual = Year.now().getValue();
         
         for(int i=anioActual; i<=anioActual+5; i++) { //Limite de 5 años
@@ -137,19 +158,30 @@ public class VentanaPrincipal extends JFrame {
         panelFechaIda.add(cbmMesIda); 
         panelFechaIda.add(cbmAnioIda); 
         
+        //Fecha de la vuelta
         JComboBox<Integer> cbmDiaVuelta = new JComboBox<Integer>();
         JComboBox<String> cbmMesVuelta = new JComboBox<String>();
         JComboBox<Integer> cbmAnioVuelta = new JComboBox<Integer>();
         
+        LocalDate maniana = LocalDate.now().plusDays(1);
+        int diaManiana = maniana.getDayOfMonth();
+        String mesManiana = meses[maniana.getMonthValue() - 1];
+        int anioManiana = maniana.getYear();
+        
         for(int i=1; i<=31; i++) {
         	cbmDiaVuelta.addItem(i);
         }
+        cbmDiaVuelta.setSelectedItem(diaManiana); 
+        
         for(String mes : meses) { 
         	cbmMesVuelta.addItem(mes);
         }
+        cbmMesVuelta.setSelectedItem(mesManiana); 
+        
         for(int i=anioActual; i<=anioActual+5; i++) { 
         	cbmAnioVuelta.addItem(i);
         }
+        cbmAnioVuelta.setSelectedItem(anioManiana); 
         
         JPanel panelFechaVuelta = new JPanel(new FlowLayout(FlowLayout.LEFT, 3, 0));
         panelFechaVuelta.setOpaque(false);
