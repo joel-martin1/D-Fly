@@ -39,7 +39,7 @@ public class DestinoRecTarjeta extends JPanel{
 				ImageIcon origIcon= new ImageIcon(imageUrl);
 				Image origImage= origIcon.getImage();
 				
-				Image resImage= origImage.getScaledInstance(-1, -1, Image.SCALE_SMOOTH);
+				Image resImage= origImage.getScaledInstance(1550, 500, Image.SCALE_SMOOTH);
 				lblImagen.setIcon(new ImageIcon(resImage));
 			}else {
 				lblImagen.setText("Imagen no encontrada");

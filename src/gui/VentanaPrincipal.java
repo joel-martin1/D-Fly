@@ -254,10 +254,10 @@ public class VentanaPrincipal extends JFrame {
 
         JPanel panelDestinosGrid= new JPanel(new GridLayout(2,2,20,20));
         //Estos datos vendrán de la base de datos, por ahora, se quedan manuales
-        DestinoRecTarjeta tarjetaDonosti= new DestinoRecTarjeta("/resources/san-sebastian-spagna-1.jpg", "San Sebastián, España", 200);
+        DestinoRecTarjeta tarjetaDonosti= new DestinoRecTarjeta("/resources/donosti.jpg", "San Sebastián, España", 200);
         panelDestinosGrid.add(tarjetaDonosti);
         
-        DestinoRecTarjeta tarjetaNewYork= new DestinoRecTarjeta("/resources/new-york.jpeg", "Nueva York, EEUU", 700);
+        DestinoRecTarjeta tarjetaNewYork= new DestinoRecTarjeta("/resources/newyork.jpg", "Nueva York, EEUU", 700);
         panelDestinosGrid.add(tarjetaNewYork);
         
         DestinoRecTarjeta tarjetaTokyo= new DestinoRecTarjeta("/resources/tokio.jpg", "Tokio, Japón", 750);
