@@ -53,7 +53,7 @@ public class VentanaPrincipal extends JFrame {
         panelIconoLogin.setOpaque(false);
         JButton btnIconoLogin = new JButton();
         try {
-            URL iconUrl = getClass().getResource("/resources/user_icon.png");
+            URL iconUrl = getClass().getResource("/resources/perfil.png");
             if (iconUrl != null) {
                 ImageIcon userIcon = new ImageIcon(iconUrl);
                 Image img = userIcon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
