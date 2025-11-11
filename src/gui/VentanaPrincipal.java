@@ -81,11 +81,7 @@ public class VentanaPrincipal extends JFrame {
         //Navegación y Búsqueda
         JPanel searchPanelCompleto = new JPanel(new BorderLayout());
         searchPanelCompleto.setBackground(UIConstants.DFLY);
-        
-        Border lineaSuperior = BorderFactory.createMatteBorder(10, 0, 0, 0, Color.WHITE);
-        Border padding = new EmptyBorder(10, 20, 15, 20);
-        searchPanelCompleto.setBorder(BorderFactory.createCompoundBorder(lineaSuperior, padding));
-
+  
         //Pestañas (Alojamiento, Vuelo, Aloj + Vuelo)
         JPanel panelPestanas = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         panelPestanas.setOpaque(false);
@@ -236,7 +232,6 @@ public class VentanaPrincipal extends JFrame {
         //SearchPanelCompleto
         gbcSuperior.gridy = 1;
         gbcSuperior.weightx = 0; // No crece
-        gbcSuperior.fill = GridBagConstraints.NONE; //El tamaño va a ser dependiendo de lo que haya dentro
         gbcSuperior.anchor = GridBagConstraints.CENTER; // Se centra en el espacio sobrante
         panelSuperiorCompleto.add(searchPanelCompleto, gbcSuperior);
    
