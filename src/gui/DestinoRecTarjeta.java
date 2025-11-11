@@ -26,7 +26,7 @@ public class DestinoRecTarjeta extends JPanel{
 		setBackground(Color.WHITE);
 		
 		//Bordes de la tarjeta
-		Border lineBorder= BorderFactory.createLineBorder(Color.WHITE);
+		Border lineBorder= BorderFactory.createLineBorder(UIConstants.DFLY);
 		Border padding= new EmptyBorder(10,10,10,10);
 		setBorder(BorderFactory.createCompoundBorder(lineBorder, padding));
 		
@@ -39,7 +39,7 @@ public class DestinoRecTarjeta extends JPanel{
 				ImageIcon origIcon= new ImageIcon(imageUrl);
 				Image origImage= origIcon.getImage();
 				
-				Image resImage= origImage.getScaledInstance(250, -1, Image.SCALE_SMOOTH);
+				Image resImage= origImage.getScaledInstance(-1, -1, Image.SCALE_SMOOTH);
 				lblImagen.setIcon(new ImageIcon(resImage));
 			}else {
 				lblImagen.setText("Imagen no encontrada");
