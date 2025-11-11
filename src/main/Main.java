@@ -13,8 +13,17 @@ import db.DBManager;
 public class Main {
     public static void main(String[] args) {
     	
+    	final boolean MODO_RESET= true;
+    	
     	//SQL TABLAS
     	DBManager.createTables();
+    	
+    	if(MODO_RESET) {
+    		System.out.println("Modo RESET: Reiniciando tablas");
+    		DBManager.reinicializarDatos();
+    	}else {
+    		System.out.println("Modo NORMAL: Inciando App");
+    	}
     	
     	SwingUtilities.invokeLater(() -> {
         	VentanaPantallaCarga ventanaCarga = new VentanaPantallaCarga();

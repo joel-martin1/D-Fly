@@ -90,5 +90,75 @@ public class DBManager {
 				
 	}
 	
+	/*
+	 * BORRAR TODOS LOS DATOS, SOLO USAR PARA PRUEBAS DE APLICACION O PARA REINICIAR LA BASE DE DATOS
+	 */
+	
+	public static void reinicializarDatos() {
+		try(Connection conn= conectar();
+			Statement stmt= conn.createStatement()) {
+			
+			//Borramos los datos que haya en cada tabla
+            stmt.execute("DELETE FROM Reserva;");
+            stmt.execute("DELETE FROM Vuelo;");
+            stmt.execute("DELETE FROM Hotel;");
+            stmt.execute("DELETE FROM Destino;");
+            stmt.execute("DELETE FROM Usuario;");
+            stmt.execute("DELETE FROM sqlite_sequence WHERE name IN ('Usuario', 'Destino', 'Vuelo', 'Hotel', 'Reserva');");
+            System.out.println("Tablas reseteadas");
+
+            /*
+             * Insertamos 4 datos inciales
+             */
+            
+            String sqlUsuarios= 
+                "INSERT INTO Usuario (email, password, nombre, rol, descuento) VALUES " +
+                "('admin@dfly.com', 'admin123', 'Admin D-Fly', 'ADMIN', 0.15)," +
+                "('ana@test.com', 'pass1', 'Ana García', 'CLIENTE', 0.0)," +
+                "('bruno@test.com', 'pass2', 'Bruno Solis', 'CLIENTE', 0.05)," +
+                "('carla@test.com', 'pass3', 'Carla Diaz', 'CLIENTE', 0.0);";
+            stmt.execute(sqlUsuarios);
+
+            String sqlDestinos=
+                "INSERT INTO Destino (ciudad, pais, descripcion, url_imagen) VALUES " +
+                "('Donosti', 'España', 'Zinemaldi', '/resources/tokio.jpg')," +
+                "('Nueva York', 'EEUU', 'La gran manzana', '/resources/nuevayork.jpg')," +
+                "('Tokio', 'Japon', 'Pais del sol naciente', '/resources/tokio.jpg')," +
+                "('Dubai', 'UAE', 'Vive como un millonario', '/resources/ny.jpg');";
+            stmt.execute(sqlDestinos);
+
+            String sqlVuelos=
+                "INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
+                "(1, 2, '2025-12-01 10:00', 950.0, 'D-Fly Air')," +        // Donosti (1) -> Nueva York (2)
+                "(2, 3, '2025-12-05 14:30', 120.0, 'EuroWing')," +         // Nueva York (2) -> Tokio (3)
+                "(4, 1, '2025-12-10 08:00', 1100.0, 'Japan Airlines')," +  // Dubai (4) -> Donosti (1)
+                "(3, 4, '2025-12-15 11:00', 600.0, 'Iberia');";          // Tokio (3) -> Dubai (4)
+            stmt.execute(sqlVuelos);
+
+            String sqlHoteles=
+                "INSERT INTO Hotel (id_destino, nombre_hotel, precio_noche) VALUES " +
+                "(1, 'Maria Cristina', 220.0)," +      //Hotel en Donosti(1)
+                "(2, 'Innside', 180.0)," +             //Hotel en Nueva York(2)
+                "(3, 'Manga art Hotel', 90.0)," +      //Hotel en Tokio (3)
+                "(4, 'Burj Al Arab', 500);";           //Hotel en Dubai (4)
+            stmt.execute(sqlHoteles);
+
+            String sqlReservas=
+                "INSERT INTO Reserva (id_usuario, id_vuelo, id_hotel, fecha_reserva, precio_total_pagado) VALUES " +
+                "(2, 1, NULL, '2025-11-10 09:00', 950.0)," +  // Ana (2) compra Vuelo 1
+                "(3, NULL, 2, '2025-11-11 11:00', 180.0)," +  // Bruno (3) reserva Hotel 2
+                "(4, 3, 1, '2025-11-12 14:00', 1320.0)," + // Carla (4) compra Vuelo 3 Y Hotel 1
+                "(2, 4, NULL, '2025-11-15 17:00', 600.0);";  // Ana (2) compra Vuelo 4
+            stmt.execute(sqlReservas);
+            
+            System.out.println("Datos iniciales insertados");
+			
+			
+		}catch(SQLException e) {
+			System.err.println("No se han podido inicializar los datos");
+			e.printStackTrace();
+		}
+	}
+	
 
 }
