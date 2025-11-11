@@ -257,11 +257,21 @@ public class VentanaPrincipal extends JFrame {
         lblTituloDestinos.setHorizontalAlignment(SwingConstants.CENTER);
         mainContentPanel.add(lblTituloDestinos, BorderLayout.NORTH);
 
-        JPanel panelPlaceholder = new JPanel();
-        panelPlaceholder.setBackground(new Color(235, 235, 235));
-        panelPlaceholder.setBorder(BorderFactory.createEtchedBorder());
-        panelPlaceholder.add(new JLabel("(Aquí irían los destinos recomendados)"));
-        mainContentPanel.add(panelPlaceholder, BorderLayout.CENTER);
+        JPanel panelDestinosGrid= new JPanel(new GridLayout(2,2,20,20));
+        //Estos datos vendrán de la base de datos, por ahora, se quedan manuales
+        DestinoRecTarjeta tarjetaDonosti= new DestinoRecTarjeta("/resources/san-sebastian-spagna-1.jpg", "San Sebastián, España", 200);
+        panelDestinosGrid.add(tarjetaDonosti);
+        
+        DestinoRecTarjeta tarjetaNewYork= new DestinoRecTarjeta("/resources/new-york.jpeg", "Nueva York, EEUU", 700);
+        panelDestinosGrid.add(tarjetaNewYork);
+        
+        DestinoRecTarjeta tarjetaTokyo= new DestinoRecTarjeta("/resources/tokio.jpg", "Tokio, Japón", 750);
+        panelDestinosGrid.add(tarjetaTokyo);
+        
+        DestinoRecTarjeta tarjetaDubai= new DestinoRecTarjeta("/resources/dubai.jpg", "Dubai, UAE", 640);
+        panelDestinosGrid.add(tarjetaDubai);
+        
+        mainContentPanel.add(panelDestinosGrid, BorderLayout.CENTER);
 
         add(mainContentPanel, BorderLayout.CENTER);
     }
