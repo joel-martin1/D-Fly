@@ -15,6 +15,8 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Vector;
+import java.util.List;
+
 
 import domain.*;
 
@@ -22,6 +24,7 @@ public class VentanaPrincipal extends JFrame {
 	private Vector<String> mesesVector = new Vector<>();
 	private ArrayList<Destino> destinos= new ArrayList<Destino>();
 	private Destino[] destinosRec= new Destino[4];
+	private JPanel panelDestinosGrid;
 	
 	DBManager cargaDestinos= new DBManager();
 
@@ -256,31 +259,31 @@ public class VentanaPrincipal extends JFrame {
         //Thread
         
         destinos= cargaDestinos.cargarDestinos();
-        Thread hiloRec= new Thread(()->{
-        	Random r= new Random();
-        	int primero;
-        	int segundo;
-        	int tercero;
-        	int cuarto;
-        	primero= r.nextInt(destinos.size());
-        	segundo= r.nextInt(destinos.size());
-        	while(segundo==primero) {
-        		segundo= r.nextInt(destinos.size());
-        	}
-        	tercero= r.nextInt(destinos.size());
-        	while(tercero==primero || tercero==segundo) {
-        		tercero= r.nextInt(destinos.size());
-        	}
-        	cuarto= r.nextInt(destinos.size());
-        	while(cuarto==primero || cuarto==segundo || cuarto==tercero) {
-        		cuarto= r.nextInt(destinos.size());
-        	}
-        	
-        	destinosRec[0]= destinos.get(primero);
-        	destinosRec[1]= destinos.get(segundo);
-        	destinosRec[2]= destinos.get(tercero);
-        	destinosRec[3]= destinos.get(cuarto);     	
-        });
+//        Thread hiloRec= new Thread(()->{
+//        	Random r= new Random();
+//        	int primero;
+//        	int segundo;
+//        	int tercero;
+//        	int cuarto;
+//        	primero= r.nextInt(destinos.size());
+//        	segundo= r.nextInt(destinos.size());
+//        	while(segundo==primero) {
+//        		segundo= r.nextInt(destinos.size());
+//        	}
+//        	tercero= r.nextInt(destinos.size());
+//        	while(tercero==primero || tercero==segundo) {
+//        		tercero= r.nextInt(destinos.size());
+//        	}
+//        	cuarto= r.nextInt(destinos.size());
+//        	while(cuarto==primero || cuarto==segundo || cuarto==tercero) {
+//        		cuarto= r.nextInt(destinos.size());
+//        	}
+//        	
+//        	destinosRec[0]= destinos.get(primero);
+//        	destinosRec[1]= destinos.get(segundo);
+//        	destinosRec[2]= destinos.get(tercero);
+//        	destinosRec[3]= destinos.get(cuarto);     	
+//        });
 
 
         //Panel de recomendados
@@ -293,22 +296,78 @@ public class VentanaPrincipal extends JFrame {
         lblTituloDestinos.setHorizontalAlignment(SwingConstants.CENTER);
         mainContentPanel.add(lblTituloDestinos, BorderLayout.NORTH);
 
-        JPanel panelDestinosGrid= new JPanel(new GridLayout(2,2,20,20));
+        panelDestinosGrid= new JPanel(new GridLayout(2,2,20,20));
         //Estos datos vendrán de la base de datos, por ahora, se quedan manuales
-        DestinoRecTarjeta tarjetaDonosti= new DestinoRecTarjeta("/resources/donosti.jpg", "San Sebastián, España", 200);
-        panelDestinosGrid.add(tarjetaDonosti);
+//        DestinoRecTarjeta tarjetaDonosti= new DestinoRecTarjeta("/resources/donosti.jpg", "San Sebastián, España", 200);
+//        panelDestinosGrid.add(tarjetaDonosti);
+//        
+//        DestinoRecTarjeta tarjetaNewYork= new DestinoRecTarjeta("/resources/newyork.jpg", "Nueva York, EEUU", 700);
+//        panelDestinosGrid.add(tarjetaNewYork);
+//        
+//        DestinoRecTarjeta tarjetaTokyo= new DestinoRecTarjeta("/resources/tokio.jpg", "Tokio, Japón", 750);
+//        panelDestinosGrid.add(tarjetaTokyo);
+//        
+//        DestinoRecTarjeta tarjetaDubai= new DestinoRecTarjeta("/resources/dubai.jpg", "Dubai, UAE", 640);
+//        panelDestinosGrid.add(tarjetaDubai);
         
-        DestinoRecTarjeta tarjetaNewYork= new DestinoRecTarjeta("/resources/newyork.jpg", "Nueva York, EEUU", 700);
-        panelDestinosGrid.add(tarjetaNewYork);
-        
-        DestinoRecTarjeta tarjetaTokyo= new DestinoRecTarjeta("/resources/tokio.jpg", "Tokio, Japón", 750);
-        panelDestinosGrid.add(tarjetaTokyo);
-        
-        DestinoRecTarjeta tarjetaDubai= new DestinoRecTarjeta("/resources/dubai.jpg", "Dubai, UAE", 640);
-        panelDestinosGrid.add(tarjetaDubai);
-        
+        JPanel panelCargando= new JPanel(new FlowLayout());
+        panelCargando.add(new JLabel("Cargando destinos recomendados"));
+        panelDestinosGrid.add(panelCargando);
+         
         mainContentPanel.add(panelDestinosGrid, BorderLayout.CENTER);
 
         add(mainContentPanel, BorderLayout.CENTER);
+        
+        //Thread
+        Thread hiloRec= new Thread(new Runnable() {
+        	@Override
+        	public void run() {
+        		List<Destino> destinos= cargaDestinos.cargarDestinos();
+        		
+        		Random r= new Random();
+        		int primero, segundo, tercero, cuarto;
+        		
+        		primero= r.nextInt(destinos.size());
+        		
+        		segundo= r.nextInt(destinos.size());
+        		while(segundo==primero) {
+        			segundo= r.nextInt(destinos.size());
+        		}
+        		
+        		tercero= r.nextInt(destinos.size());
+        		while(tercero==primero || tercero==segundo) {
+        			tercero= r.nextInt(destinos.size());
+        		}
+        		cuarto= r.nextInt(destinos.size());
+        		while(cuarto==tercero || cuarto==segundo || cuarto==primero) {
+        			cuarto= r.nextInt(destinos.size());
+        		}
+        		
+        		destinosRec[0]= destinos.get(primero);
+        		destinosRec[1]= destinos.get(segundo);
+        		destinosRec[2]= destinos.get(tercero);
+        		destinosRec[3]= destinos.get(cuarto);
+        		
+        		SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+						for(Destino d:destinosRec) {
+							DestinoRecTarjeta tarjeta= new DestinoRecTarjeta(d.getUrlImagen(), d.getCiudad() + "," + d.getPais(), 0.0);
+							panelDestinosGrid.add(tarjeta);
+							
+						}
+						
+					}
+        			
+        		});
+        		
+        		
+        			
+        		
+        	}
+        	
+        });
+        hiloRec.start();
     }
 }
