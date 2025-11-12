@@ -2,10 +2,17 @@ package db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+
+import domain.Destino;
 
 public class DBManager {
+	
+	ArrayList<Destino> destinos= new ArrayList<Destino>();
+	
 	private static final String URL= "jdbc:sqlite:db/dfly.db";
 	
 	public static Connection conectar() {
@@ -158,6 +165,33 @@ public class DBManager {
 			System.err.println("No se han podido inicializar los datos");
 			e.printStackTrace();
 		}
+	}
+	
+	public ArrayList<Destino> cargarDestinos() {
+		String sql= "SELECT id_destino, ciudad, pais, descripcion, url_imagen FROM Destino";
+		
+		try (Connection conn= conectar();
+			 Statement stmt= conn.createStatement();
+			 ResultSet rs= stmt.executeQuery(sql)){
+			
+			while(rs.next()) {
+				int id_destino= rs.getInt("id_destino");
+				String ciudad= rs.getString("ciudad");
+				String pais= rs.getString("pais");
+				String descripcion= rs.getString("descripcion");
+				String url_imagen= rs.getString("url_imagen");
+				
+				Destino d= new Destino(id_destino, ciudad, pais, descripcion, url_imagen);
+				
+				destinos.add(d);
+				
+			}
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return destinos;
 	}
 	
 

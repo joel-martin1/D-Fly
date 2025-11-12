@@ -4,14 +4,26 @@ import util.UIConstants; //Colores
 
 import javax.swing.*;
 import javax.swing.border.*;
+
+import db.DBManager;
+
 import java.awt.*;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.Year;
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.Vector;
+
+import domain.*;
 
 public class VentanaPrincipal extends JFrame {
 	private Vector<String> mesesVector = new Vector<>();
+	private ArrayList<Destino> destinos= new ArrayList<Destino>();
+	private Destino[] destinosRec= new Destino[4];
+	
+	DBManager cargaDestinos= new DBManager();
 
     public VentanaPrincipal() {
         setTitle("D-Fly");
@@ -240,6 +252,35 @@ public class VentanaPrincipal extends JFrame {
          */
         
         add(panelSuperiorCompleto, BorderLayout.NORTH);
+        
+        //Thread
+        
+        destinos= cargaDestinos.cargarDestinos();
+        Thread hiloRec= new Thread(()->{
+        	Random r= new Random();
+        	int primero;
+        	int segundo;
+        	int tercero;
+        	int cuarto;
+        	primero= r.nextInt(destinos.size());
+        	segundo= r.nextInt(destinos.size());
+        	while(segundo==primero) {
+        		segundo= r.nextInt(destinos.size());
+        	}
+        	tercero= r.nextInt(destinos.size());
+        	while(tercero==primero || tercero==segundo) {
+        		tercero= r.nextInt(destinos.size());
+        	}
+        	cuarto= r.nextInt(destinos.size());
+        	while(cuarto==primero || cuarto==segundo || cuarto==tercero) {
+        		cuarto= r.nextInt(destinos.size());
+        	}
+        	
+        	destinosRec[0]= destinos.get(primero);
+        	destinosRec[1]= destinos.get(segundo);
+        	destinosRec[2]= destinos.get(tercero);
+        	destinosRec[3]= destinos.get(cuarto);     	
+        });
 
 
         //Panel de recomendados
