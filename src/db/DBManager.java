@@ -128,10 +128,10 @@ public class DBManager {
 
             String sqlDestinos=
                 "INSERT INTO Destino (ciudad, pais, descripcion, url_imagen) VALUES " +
-                "('Donosti', 'España', 'Zinemaldi', '/resources/tokio.jpg')," +
-                "('Nueva York', 'EEUU', 'La gran manzana', '/resources/nuevayork.jpg')," +
+                "('Donosti', 'España', 'Zinemaldi', '/resources/donosti.jpg')," +
+                "('Nueva York', 'EEUU', 'La gran manzana', '/resources/newyork.jpg')," +
                 "('Tokio', 'Japon', 'Pais del sol naciente', '/resources/tokio.jpg')," +
-                "('Dubai', 'UAE', 'Vive como un millonario', '/resources/ny.jpg');";
+                "('Dubai', 'UAE', 'Vive como un millonario', '/resources/dubai.jpg');";
             stmt.execute(sqlDestinos);
 
             String sqlVuelos=

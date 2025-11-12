@@ -256,36 +256,6 @@ public class VentanaPrincipal extends JFrame {
         
         add(panelSuperiorCompleto, BorderLayout.NORTH);
         
-        //Thread
-        
-        destinos= cargaDestinos.cargarDestinos();
-//        Thread hiloRec= new Thread(()->{
-//        	Random r= new Random();
-//        	int primero;
-//        	int segundo;
-//        	int tercero;
-//        	int cuarto;
-//        	primero= r.nextInt(destinos.size());
-//        	segundo= r.nextInt(destinos.size());
-//        	while(segundo==primero) {
-//        		segundo= r.nextInt(destinos.size());
-//        	}
-//        	tercero= r.nextInt(destinos.size());
-//        	while(tercero==primero || tercero==segundo) {
-//        		tercero= r.nextInt(destinos.size());
-//        	}
-//        	cuarto= r.nextInt(destinos.size());
-//        	while(cuarto==primero || cuarto==segundo || cuarto==tercero) {
-//        		cuarto= r.nextInt(destinos.size());
-//        	}
-//        	
-//        	destinosRec[0]= destinos.get(primero);
-//        	destinosRec[1]= destinos.get(segundo);
-//        	destinosRec[2]= destinos.get(tercero);
-//        	destinosRec[3]= destinos.get(cuarto);     	
-//        });
-
-
         //Panel de recomendados
         JPanel mainContentPanel = new JPanel(new BorderLayout());
         mainContentPanel.setBackground(Color.WHITE);
@@ -297,23 +267,7 @@ public class VentanaPrincipal extends JFrame {
         mainContentPanel.add(lblTituloDestinos, BorderLayout.NORTH);
 
         panelDestinosGrid= new JPanel(new GridLayout(2,2,20,20));
-        //Estos datos vendrán de la base de datos, por ahora, se quedan manuales
-//        DestinoRecTarjeta tarjetaDonosti= new DestinoRecTarjeta("/resources/donosti.jpg", "San Sebastián, España", 200);
-//        panelDestinosGrid.add(tarjetaDonosti);
-//        
-//        DestinoRecTarjeta tarjetaNewYork= new DestinoRecTarjeta("/resources/newyork.jpg", "Nueva York, EEUU", 700);
-//        panelDestinosGrid.add(tarjetaNewYork);
-//        
-//        DestinoRecTarjeta tarjetaTokyo= new DestinoRecTarjeta("/resources/tokio.jpg", "Tokio, Japón", 750);
-//        panelDestinosGrid.add(tarjetaTokyo);
-//        
-//        DestinoRecTarjeta tarjetaDubai= new DestinoRecTarjeta("/resources/dubai.jpg", "Dubai, UAE", 640);
-//        panelDestinosGrid.add(tarjetaDubai);
-        
-        JPanel panelCargando= new JPanel(new FlowLayout());
-        panelCargando.add(new JLabel("Cargando destinos recomendados"));
-        panelDestinosGrid.add(panelCargando);
-         
+ 
         mainContentPanel.add(panelDestinosGrid, BorderLayout.CENTER);
 
         add(mainContentPanel, BorderLayout.CENTER);
@@ -353,20 +307,12 @@ public class VentanaPrincipal extends JFrame {
 					@Override
 					public void run() {
 						for(Destino d:destinosRec) {
-							DestinoRecTarjeta tarjeta= new DestinoRecTarjeta(d.getUrlImagen(), d.getCiudad() + "," + d.getPais(), 0.0);
-							panelDestinosGrid.add(tarjeta);
-							
+							DestinoRecTarjeta tarjeta= new DestinoRecTarjeta(d.getUrlImagen(), d.getCiudad() + ", " + d.getPais(), 0.0);
+							panelDestinosGrid.add(tarjeta);	
 						}
-						
-					}
-        			
+					}	
         		});
-        		
-        		
-        			
-        		
-        	}
-        	
+        	}	
         });
         hiloRec.start();
     }

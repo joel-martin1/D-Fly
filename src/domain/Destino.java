@@ -1,3 +1,4 @@
+//TODO: Implementar un precio desde (será "algo" que recorra todos los precios posible de ese destino, y pondrá el mas barato)
 package domain;
 
 public class Destino {
@@ -6,6 +7,7 @@ public class Destino {
 	private String pais;
 	private String descripcion;
 	private String urlImagen;
+	private double precioDesde;
 	
 	
 	public Destino(int id_destino, String ciudad, String pais, String descripcion, String urlImagen) {
@@ -14,6 +16,23 @@ public class Destino {
 		this.pais= pais;
 		this.descripcion= descripcion;
 		this.urlImagen= urlImagen;
+		
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	public double getPrecioDesde() {
+		return precioDesde;
+	}
+
+	public void setPrecioDesde(double precioDesde) {
+		this.precioDesde = precioDesde;
 	}
 
 	public int getId_destino() {
