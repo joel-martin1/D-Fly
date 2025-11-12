@@ -1,3 +1,4 @@
+//TODO: Cambiar los botones selectores, por botones que cambien de color depende del seleccionado (Vuelo, Alojamiento, Aloj+Vuelo)
 package gui;
 
 import util.UIConstants; //Colores
@@ -112,7 +113,7 @@ public class VentanaPrincipal extends JFrame {
         for (JRadioButton rb : new JRadioButton[]{rbVuelo, rbAlojamiento, rbAlojVuelo}) {
             rb.setForeground(Color.WHITE);
             rb.setOpaque(false);
-            rb.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            rb.setFont(new Font("Segoe UI", Font.BOLD, 25));
             rb.setCursor(new Cursor(Cursor.HAND_CURSOR));
             panelPestanas.add(rb);
         }
