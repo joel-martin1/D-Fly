@@ -308,7 +308,7 @@ public class VentanaPrincipal extends JFrame {
 					@Override
 					public void run() {
 						for(Destino d:destinosRec) {
-							DestinoRecTarjeta tarjeta= new DestinoRecTarjeta(d.getUrlImagen(), d.getCiudad() + ", " + d.getPais(), 0.0);
+							DestinoRecTarjeta tarjeta= new DestinoRecTarjeta(d.getUrlImagen(), d.getCiudad() + ", " + d.getPais(), d.getPrecioDesde());
 							panelDestinosGrid.add(tarjeta);	
 						}
 					}	

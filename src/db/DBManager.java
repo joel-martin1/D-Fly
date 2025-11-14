@@ -2,12 +2,17 @@ package db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
 import domain.Destino;
+
+
+
+
 
 public class DBManager {
 	
@@ -146,7 +151,7 @@ public class DBManager {
                 "INSERT INTO Hotel (id_destino, nombre_hotel, precio_noche) VALUES " +
                 "(1, 'Maria Cristina', 220.0)," +      //Hotel en Donosti(1)
                 "(2, 'Innside', 180.0)," +             //Hotel en Nueva York(2)
-                "(3, 'Manga art Hotel', 90.0)," +      //Hotel en Tokio (3)
+                "(3, 'Manga art Hotel', 234)," +      //Hotel en Tokio (3)
                 "(4, 'Burj Al Arab', 500);";           //Hotel en Dubai (4)
             stmt.execute(sqlHoteles);
 
@@ -168,26 +173,40 @@ public class DBManager {
 	}
 	
 	public ArrayList<Destino> cargarDestinos() {
-		String sql= "SELECT id_destino, ciudad, pais, descripcion, url_imagen FROM Destino";
+		ArrayList<Destino> destinos= new ArrayList<>();
 		
-		try (Connection conn= conectar();
-			 Statement stmt= conn.createStatement();
-			 ResultSet rs= stmt.executeQuery(sql)){
+		String sql=
+				"SELECT "+
+				"	d.id_destino, d.ciudad, d.pais, d.descripcion, d.url_imagen, "+
+				"	( "+
+				"		COALESCE((SELECT MIN(v.precio) FROM Vuelo v WHERE v.id_destino = d.id_destino), 0.0) "+
+				"	) + ( "+
+				"		COALESCE((SELECT MIN(h.precio_noche) FROM Hotel h WHERE h.id_destino = d.id_destino), 0.0) "+
+				"	) AS precio_desde "+
+				"FROM Destino d "+
+				"GROUP BY d.id_destino, d.ciudad, d.pais, d.descripcion, d.url_imagen;";
+		
+		try(Connection conn= DBManager.conectar();
+			PreparedStatement pstmt= conn.prepareStatement(sql);
+			ResultSet rs= pstmt.executeQuery()) {
 			
 			while(rs.next()) {
 				int id_destino= rs.getInt("id_destino");
 				String ciudad= rs.getString("ciudad");
 				String pais= rs.getString("pais");
 				String descripcion= rs.getString("descripcion");
-				String url_imagen= rs.getString("url_imagen");
+				String urlImagen= rs.getString("url_imagen");
+				double precioDesde= rs.getDouble("precio_desde");
 				
-				Destino d= new Destino(id_destino, ciudad, pais, descripcion, url_imagen);
+				Destino d= new Destino(id_destino, ciudad, pais, descripcion, urlImagen, precioDesde);
+				d.setPrecioDesde(precioDesde);
 				
 				destinos.add(d);
-				
 			}
 			
+			
 		}catch(SQLException e) {
+			System.err.println("No se pudo consultar los destinos recomendados");
 			e.printStackTrace();
 		}
 		

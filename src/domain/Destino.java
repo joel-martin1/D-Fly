@@ -10,7 +10,7 @@ public class Destino {
 	private double precioDesde;
 	
 	
-	public Destino(int id_destino, String ciudad, String pais, String descripcion, String urlImagen) {
+	public Destino(int id_destino, String ciudad, String pais, String descripcion, String urlImagen, double precioDesde) {
 		this.id_destino= id_destino;
 		this.ciudad= ciudad;
 		this.pais= pais;
