@@ -88,8 +88,11 @@ public class VentanaPrincipal extends JFrame {
         btnIconoLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         btnIconoLogin.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Aquí se abriría la ventana de Login/Registro");
+            VentanaLoginRegistro ventanaLoginRegistro= new VentanaLoginRegistro();
+            ventanaLoginRegistro.setVisible(true);
+            this.dispose();
         });
+            		
         
         panelIconoLogin.add(btnIconoLogin);
         headerPanel.add(panelIconoLogin, BorderLayout.EAST);
