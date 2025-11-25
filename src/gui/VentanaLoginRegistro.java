@@ -204,7 +204,7 @@ public class VentanaLoginRegistro extends JFrame {
 		    URL logoUrl = getClass().getResource("/resources/LogoDFly_Morado.png"); 
 		    if (logoUrl != null) {
 		        ImageIcon logoIcon = new ImageIcon(logoUrl);
-		        Image img = logoIcon.getImage().getScaledInstance(55, -1, Image.SCALE_SMOOTH); 
+		        Image img = logoIcon.getImage().getScaledInstance(50, -1, Image.SCALE_SMOOTH); 
 		        lblLogoRegistro.setIcon(new ImageIcon(img));
 		    } else {
 		        lblLogoRegistro.setText("LOGO");
