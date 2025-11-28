@@ -19,7 +19,9 @@ import java.util.Vector;
 import java.util.List;
 
 
+
 import domain.*;
+import gui.VentanaResultadoVuelos;
 
 public class VentanaPrincipal extends JFrame {
 	private Vector<String> mesesVector = new Vector<>();
@@ -222,6 +224,23 @@ public class VentanaPrincipal extends JFrame {
         btnBuscar.setForeground(UIConstants.DFLY);
         btnBuscar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnBuscar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // busqueda de vuelos
+        btnBuscar.addActionListener(e -> {
+            // 1. Datos de PRUEBA temporales
+            List<Vuelo> vuelos = new ArrayList<>();
+            vuelos.add(new Vuelo(1, 1, 2, "2025-12-01 10:00", "2025-12-01 16:00", 450.0, "D-Fly Air"));
+            vuelos.add(new Vuelo(2, 1, 2, "2025-12-01 14:30", "2025-12-01 20:15", 380.0, "EuroWing"));
+            
+            // 2 destinos de ejemplos
+            Destino origen = new Destino(1, "Donosti", "España", "", "/resources/donosti.jpg", 0);
+            Destino destino = new Destino(2, "Nueva York", "EEUU", "", "/resources/newyork.jpg", 0);
+            
+            // abrir ventana
+            VentanaResultadoVuelos ventana = new VentanaResultadoVuelos(vuelos, origen, destino);
+            ventana.setVisible(true);
+            this.dispose();
+        });
 
         panelFormulario.add(new JLabel("Ubicación:")).setForeground(Color.WHITE);
         panelFormulario.add(txtUbicacion);
