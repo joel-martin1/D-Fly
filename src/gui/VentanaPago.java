@@ -11,8 +11,8 @@ public class VentanaPago extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Fuente elegante
-        Font font = new Font("Segoe UI", Font.PLAIN, 14);
+        
+        Font font = new Font("Times New Roman", Font.PLAIN, 14);
 
         // Panel principal
         JPanel panel = new JPanel(new GridBagLayout());
@@ -23,10 +23,12 @@ public class VentanaPago extends JFrame {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
+
 
         JLabel lblNombre = new JLabel("Nombre del titular:");
         JTextField txtNombre = new JTextField();
-
+        
         JLabel lblNumero = new JLabel("Número de tarjeta:");
         JTextField txtNumero = new JTextField();
 
