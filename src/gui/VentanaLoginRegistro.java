@@ -16,6 +16,7 @@ import java.awt.Image;
 import java.awt.Insets;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
@@ -44,6 +45,7 @@ public class VentanaLoginRegistro extends JFrame {
 
 	/**
 	 * Launch the application.
+	 * C:\Users\julen.mulero\git\D-Fly\D-Fly
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -164,6 +166,42 @@ public class VentanaLoginRegistro extends JFrame {
 		gbc.gridwidth = 2; 
 		gbc.fill = GridBagConstraints.HORIZONTAL; 
 		panelFormularioLogin.add(btnIniciarSesion, gbc);
+		btnIniciarSesion.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String email = textUsuario.getText();
+				String password = new String(pass.getPassword());
+				
+				if (email.isEmpty()) {
+					JOptionPane.showMessageDialog(VentanaLoginRegistro.this, "El campo email no puede estar vacío","Error de Validación", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				
+				if (!email.matches("^[\\w.-]+@[a-zA-Z\\d.-]+\\.[a-zA-Z]{2,6}$")) {
+		            JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                          "El formato del email es incorrecto.", 
+		                                          "Error de Validación", 
+		                                          JOptionPane.WARNING_MESSAGE);
+		            return;
+				}
+				
+				if (password.isEmpty()) {
+		            JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                          "El campo contraseña no puede estar vacío.", 
+		                                          "Error de Validación", 
+		                                          JOptionPane.WARNING_MESSAGE);
+		            return;
+				}
+				
+				if (password.length() < 6) {
+		            JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                          "La contraseña debe tener al menos 6 caracteres.", 
+		                                          "Contraseña Insegura", 
+		                                          JOptionPane.WARNING_MESSAGE);
+		            return;
+		        }
+			}
+		});
+		
 		
 		gbc = new GridBagConstraints(); 
 		gbc.insets = new Insets(8, 5, 8, 5);
@@ -321,6 +359,45 @@ public class VentanaLoginRegistro extends JFrame {
 		gbc1.fill = GridBagConstraints.HORIZONTAL; 
 		gbc1.insets = new Insets(15, 5, 5, 5); 
 		panelFormularioRegistro.add(btnRegistrarse, gbc1);
+		btnRegistrarse.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				char[] pass1 = passReg.getPassword();
+				char[] pass2 = passConfirmar.getPassword();
+				String email1 = textEmailRegistro.getText();
+				
+				if (pass1.length < 6) {
+		            JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                          "La contraseña debe tener al menos 6 caracteres.", 
+		                                          "Contraseña Insegura", 
+		                                          JOptionPane.WARNING_MESSAGE);
+		            return;
+		        }
+				
+				if (!java.util.Arrays.equals(pass1, pass2)) {
+		            JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                          "Las contraseñas introducidas no coinciden.", 
+		                                          "Error de Contraseña", 
+		                                          JOptionPane.ERROR_MESSAGE);
+		            return;
+		        }
+				
+				if (pass1.length == 0 || textNombreUsuario.getText().isEmpty()) {
+		             JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                          "Ningún campo puede estar vacío.", 
+		                                          "Error de Validación", 
+		                                          JOptionPane.WARNING_MESSAGE);
+		            return;
+		        }
+				
+				if (!email1.matches("^[\\w.-]+@[a-zA-Z\\d.-]+\\.[a-zA-Z]{2,6}$")) {
+		            JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                          "El formato del email es incorrecto.", 
+		                                          "Error de Validación", 
+		                                          JOptionPane.WARNING_MESSAGE);
+		            return;
+				}
+			}
+		});
 		
 		gbc1 = new GridBagConstraints(); 
 	    gbc1.insets = defaultInsets;
