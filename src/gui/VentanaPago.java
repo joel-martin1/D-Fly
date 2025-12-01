@@ -7,12 +7,22 @@ public class VentanaPago extends JFrame {
 
     public VentanaPago() {
         setTitle("Ventana de Pago");
-        setSize(400, 300);
+        setSize(450, 330);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(6, 2, 10, 10));
+        // Fuente elegante
+        Font font = new Font("Segoe UI", Font.PLAIN, 14);
+
+        // Panel principal
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(new Color(245, 245, 245));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel lblNombre = new JLabel("Nombre del titular:");
         JTextField txtNombre = new JTextField();
@@ -29,16 +39,45 @@ public class VentanaPago extends JFrame {
         JButton btnPagar = new JButton("Pagar");
         JButton btnCancelar = new JButton("Cancelar");
 
-        panel.add(lblNombre);
-        panel.add(txtNombre);
-        panel.add(lblNumero);
-        panel.add(txtNumero);
-        panel.add(lblFecha);
-        panel.add(txtFecha);
-        panel.add(lblCVV);
-        panel.add(txtCVV);
-        panel.add(btnPagar);
-        panel.add(btnCancelar);
+        // Estilizar botones
+        btnPagar.setBackground(new Color(76, 175, 80));
+        btnPagar.setForeground(Color.WHITE);
+        btnPagar.setFocusPainted(false);
+
+        btnCancelar.setBackground(new Color(244, 67, 54));
+        btnCancelar.setForeground(Color.WHITE);
+        btnCancelar.setFocusPainted(false);
+
+        // Aplicar fuente a todos los componentes
+        for (JComponent c : new JComponent[]{lblNombre, txtNombre, lblNumero, txtNumero, 
+                lblFecha, txtFecha, lblCVV, txtCVV, btnPagar, btnCancelar}) {
+            c.setFont(font);
+        }
+
+        // -------- Añadir componentes con GridBag --------
+        gbc.gridx = 0; gbc.gridy = 0; panel.add(lblNombre, gbc);
+        gbc.gridx = 1; panel.add(txtNombre, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; panel.add(lblNumero, gbc);
+        gbc.gridx = 1; panel.add(txtNumero, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; panel.add(lblFecha, gbc);
+        gbc.gridx = 1; panel.add(txtFecha, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3; panel.add(lblCVV, gbc);
+        gbc.gridx = 1; panel.add(txtCVV, gbc);
+
+        // Panel de botones
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
+        panelBotones.setBackground(new Color(245, 245, 245));
+        panelBotones.add(btnPagar);
+        panelBotones.add(btnCancelar);
+        btnCancelar.addActionListener(e -> dispose());
+
+
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(panelBotones, gbc);
 
         add(panel);
 
@@ -67,33 +106,29 @@ public class VentanaPago extends JFrame {
                 String numero = txtNumero.getText().trim();
                 String fecha = txtFecha.getText().trim();
                 String cvv = txtCVV.getText().trim();
-                numero = numero.replaceAll("\\s+", " "); // Normaliza espacios múltiples
 
-
-                // Acumular errores
-                StringBuilder errores = new StringBuilder();
-
-                if (nombre.isEmpty()) {
-                    errores.append("• El nombre del titular está vacío.\n");
-                }
-             // Permitir espacios entre grupos de 4 números
+                numero = numero.replaceAll("\\s+", " ");
                 String numeroLimpio = numero.replaceAll(" ", "");
 
-                if (!numeroLimpio.matches("\\d{16}")) {
+                // Validación
+                StringBuilder errores = new StringBuilder();
+
+                if (nombre.isEmpty())
+                    errores.append("• El nombre del titular está vacío.\n");
+
+                if (!numeroLimpio.matches("\\d{16}"))
                     errores.append("• El número de tarjeta debe tener 16 dígitos (puede tener espacios).\n");
-                }
 
                 if (!fecha.matches("\\d{2}/\\d{2}")) {
                     errores.append("• La fecha debe usar formato MM/AA.\n");
                 } else {
                     int mes = Integer.parseInt(fecha.substring(0, 2));
-                    if (mes < 1 || mes > 12) {
+                    if (mes < 1 || mes > 12)
                         errores.append("• El mes debe estar entre 01 y 12.\n");
-                    }
                 }
-                if (!cvv.matches("\\d{3}")) {
+
+                if (!cvv.matches("\\d{3}"))
                     errores.append("• El CVV debe tener 3 dígitos.\n");
-                }
 
                 boolean valido = errores.length() == 0;
 
