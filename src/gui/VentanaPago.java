@@ -14,7 +14,7 @@ public class VentanaPago extends JFrame {
         
         Font font = new Font("Times New Roman", Font.PLAIN, 14);
 
-        // Panel principal
+        
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         panel.setBackground(new Color(245, 245, 245));
@@ -41,7 +41,7 @@ public class VentanaPago extends JFrame {
         JButton btnPagar = new JButton("Pagar");
         JButton btnCancelar = new JButton("Cancelar");
 
-        // Estilizar botones
+        
         btnPagar.setBackground(new Color(76, 175, 80));
         btnPagar.setForeground(Color.WHITE);
         btnPagar.setFocusPainted(false);
@@ -50,13 +50,13 @@ public class VentanaPago extends JFrame {
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFocusPainted(false);
 
-        // Aplicar fuente a todos los componentes
+        
         for (JComponent c : new JComponent[]{lblNombre, txtNombre, lblNumero, txtNumero, 
                 lblFecha, txtFecha, lblCVV, txtCVV, btnPagar, btnCancelar}) {
             c.setFont(font);
         }
 
-        // -------- Añadir componentes con GridBag --------
+        
         gbc.gridx = 0; gbc.gridy = 0; panel.add(lblNombre, gbc);
         gbc.gridx = 1; panel.add(txtNombre, gbc);
 
@@ -69,7 +69,7 @@ public class VentanaPago extends JFrame {
         gbc.gridx = 0; gbc.gridy = 3; panel.add(lblCVV, gbc);
         gbc.gridx = 1; panel.add(txtCVV, gbc);
 
-        // Panel de botones
+        
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         panelBotones.setBackground(new Color(245, 245, 245));
         panelBotones.add(btnPagar);
@@ -83,7 +83,7 @@ public class VentanaPago extends JFrame {
 
         add(panel);
 
-        // Acción del botón PAGAR con hilo
+        
         btnPagar.addActionListener(e -> {
 
             new Thread(() -> {
