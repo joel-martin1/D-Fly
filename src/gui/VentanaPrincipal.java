@@ -1,14 +1,18 @@
-//TODO: Cambiar los botones selectores, por botones que cambien de color depende del seleccionado (Vuelo, Alojamiento, Aloj+Vuelo)
 package gui;
 
 import util.UIConstants; //Colores
 
+import javax.swing.text.AttributeSet;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 import db.DBManager;
 
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.time.LocalDate;
@@ -18,7 +22,8 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.List;
 
-
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 import domain.*;
 import gui.VentanaResultadoVuelos;
@@ -130,7 +135,8 @@ public class VentanaPrincipal extends JFrame {
         JPanel panelFormulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         panelFormulario.setOpaque(false);
 
-        JTextField txtUbicacion = new JTextField(25);
+        AutocompleteTextField txtUbicacion= new AutocompleteTextField(25);
+        txtUbicacion.setSugerencias(cargaDestinos.getNombresDestinos());
         //JComboBox de Fecha Ida
         JComboBox<Integer> cbmDiaIda = new JComboBox<Integer>(); 
         JComboBox<String> cbmMesIda = new JComboBox<String>(); 
@@ -338,5 +344,77 @@ public class VentanaPrincipal extends JFrame {
         	}	
         });
         hiloRec.start();
+    }
+    private class AutocompleteTextField extends JTextField{
+    	private ArrayList<String> sugerencias;
+    	private boolean isDeleting;
+    	
+    	public AutocompleteTextField(int col) {
+    		super(col);
+    		this.sugerencias= new ArrayList<String>();
+    		init();
+    	}
+    	
+    	public void setSugerencias(ArrayList<String> sugerencias) {
+    		this.sugerencias= sugerencias;
+    	}
+    	private void init() {
+    		//Estetica gris para simular autocompletado
+    		setSelectionColor(Color.WHITE);
+    		setSelectedTextColor(new Color(160,160,160));
+    		
+    		//Detectar si se borra texto
+    		addKeyListener(new KeyAdapter() {
+    			@Override
+    			public void keyPressed(KeyEvent e) {
+    				isDeleting= (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE);
+    			}
+    		});
+    	}
+    	/*
+    	 * Inicio GEMINI AI
+    	 */
+    	
+    	private String quitarTildes(String input) {
+    		if(input == null) {
+    			return "";
+    		}
+    		String normalized= Normalizer.normalize(input, Normalizer.Form.NFD);
+    		Pattern pattern= Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+    		return pattern.matcher(normalized).replaceAll("");
+    	}
+    	
+    	@Override
+    	protected javax.swing.text.Document createDefaultModel(){
+    		return new AutocompleteDocument();
+    	}
+    	
+    	private class AutocompleteDocument extends PlainDocument{
+    		@Override
+    		public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+    			if(sugerencias == null || sugerencias.isEmpty() || isDeleting) {
+    				super.insertString(offs, str, a);
+    				return;
+    			}
+    			
+    			super.insertString(offs, str, a);
+    			String content= getText(0, getLength());
+    			String contentClean= quitarTildes(content).toLowerCase();
+    			
+    			for(String sugerencia :  sugerencias) {
+    				String sugerenciaClean= quitarTildes(sugerencia).toLowerCase();
+    				if(sugerenciaClean.startsWith(contentClean)) {
+    					String parteSugerida= sugerencia.substring(content.length());
+    					super.insertString(getLength(), parteSugerida, a);
+    					setCaretPosition(getLength());
+    					moveCaretPosition(content.length());
+    					return;
+    					/*
+    					 * Fin GEMINI AI
+    					 */
+    				}
+    			}
+    		}
+    	}
     }
 }

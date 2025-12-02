@@ -232,4 +232,21 @@ public class DBManager {
 		
 		return destinos;
 	}
+	
+	public ArrayList<String> getNombresDestinos() {
+        ArrayList<String> nombres = new ArrayList<>();
+        String sql = "SELECT ciudad, pais FROM Destino";
+
+        try (Connection conn = conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                nombres.add(rs.getString("ciudad"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return nombres;
+    }
 }
