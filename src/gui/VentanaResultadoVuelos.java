@@ -1,4 +1,4 @@
-package gui;
+	package gui;
 
 import javax.swing.*;
 import domain.Vuelo;
@@ -112,5 +112,45 @@ BorderFactory.createLineBorder(UIConstants.DFLY,1),
                      
         			
         }
+	}
+	public class MergeSortClass{
+		
+		public List<Vuelo> mergeSort(List<Vuelo> lista){
+			if(lista.size()==1) {
+				return lista;
+			}else {
+				int m= lista.size()/2;
+				List<Vuelo> listaIzq= new ArrayList<Vuelo>();
+				listaIzq= lista.subList(0, m);
+				List<Vuelo> listaDer= new ArrayList<Vuelo>();
+				listaDer= lista.subList(m+1, lista.size());
+				return mergeSortAux(mergeSort(listaIzq), mergeSort(listaDer));
+				
+			}
+			
+		}
+		public List<Vuelo> mergeSortAux(List<Vuelo> listaIzq, List<Vuelo> listaDer){
+			
+			if(listaIzq.size()==0) {
+				return listaDer;
+			}
+			if(listaDer.size()==0) {
+				return listaIzq;
+			}
+			
+			if(listaIzq.get(0).getPrecio() < listaDer.get(0).getPrecio()) {
+				List<Vuelo> cabeza= listaIzq.subList(0, 1);
+				cabeza.addAll(mergeSortAux(listaIzq.subList(0, 1), listaDer));
+				return cabeza;
+			}else {
+				List<Vuelo> cabeza= listaDer.subList(0, 1);
+				cabeza.addAll(mergeSortAux(listaIzq, listaDer.subList(0, 1)));
+				return cabeza;
+				
+			}
+		}
+		
+		
+		
 	}
 }
