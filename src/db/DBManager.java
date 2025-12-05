@@ -249,4 +249,66 @@ public class DBManager {
         }
         return nombres;
     }
+	
+	public static String autenticarUsuario(String email, String password) {
+	    String rol = null;
+	    String sql = "SELECT rol FROM Usuario WHERE email = ? AND password = ?";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setString(1, email);
+	        pstmt.setString(2, password);
+	        
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                rol = rs.getString("rol");
+	            }
+	        }
+	        
+	    } catch (SQLException e) {
+	        System.err.println("Error al autenticar el usuario: " + e.getMessage());
+	    }
+	    return rol;
+	}
+	
+	public static boolean insertarNuevoVuelo(int idOrigen, int idDestino, String fechaSalida, double precio, String aerolinea) {
+	    String sql = "INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES (?, ?, ?, ?, ?)";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setInt(1, idOrigen);
+	        pstmt.setInt(2, idDestino);
+	        pstmt.setString(3, fechaSalida); 
+	        pstmt.setDouble(4, precio);
+	        pstmt.setString(5, aerolinea);
+	        
+	        int filasAfectadas = pstmt.executeUpdate();
+	        return filasAfectadas > 0;
+	        
+	    } catch (SQLException e) {
+	        System.err.println("Error al insertar un nuevo vuelo: " + e.getMessage());
+	        return false;
+	    }
+	}
+	
+	//Id de destino a partir de nombre
+	public static int obtenerIdDestinoPorNombre(String ciudad) {
+	    String sql = "SELECT id_destino FROM Destino WHERE ciudad = ?";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setString(1, ciudad);
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getInt("id_destino");
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error al obtener el ID del destino: " + e.getMessage());
+	    }
+	    return -1; 
+	}
 }

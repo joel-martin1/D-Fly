@@ -2,12 +2,13 @@ package gui;
 
 import java.awt.EventQueue;
 
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import util.UIConstants;
-
+import db.DBManager;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -43,22 +44,6 @@ public class VentanaLoginRegistro extends JFrame {
 	private JPasswordField passwordField;
 	private JPasswordField passwordField_1;
 
-	/**
-	 * Launch the application.
-	 * C:\Users\julen.mulero\git\D-Fly\D-Fly
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaLoginRegistro frame = new VentanaLoginRegistro();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -192,13 +177,41 @@ public class VentanaLoginRegistro extends JFrame {
 		            return;
 				}
 				
-				if (password.length() < 6) {
+				if (password.length() < 5) {
 		            JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
-		                                          "La contraseña debe tener al menos 6 caracteres.", 
+		                                          "La contraseña debe tener al menos 5 caracteres.", 
 		                                          "Contraseña Insegura", 
 		                                          JOptionPane.WARNING_MESSAGE);
 		            return;
 		        }
+				
+				String rolUsuario = db.DBManager.autenticarUsuario(email, password);
+				
+				if (rolUsuario != null) {
+					if ("ADMIN".equals(rolUsuario)) {
+						JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+                                "Bienvenido, Administrador!", 
+                                "Acceso concedido", 
+                                JOptionPane.INFORMATION_MESSAGE);
+						
+						VentanaAdmin adminFrame = new VentanaAdmin();
+						adminFrame.setVisible(true);
+						
+						VentanaLoginRegistro.this.dispose();
+						
+						
+					} else if ("CLIENTE".equals(rolUsuario)) {
+						JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+                                "Login de Cliente exitoso!", 
+                                "Acceso concedido", 
+                                JOptionPane.INFORMATION_MESSAGE);
+					}else {
+						JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+                                "Usuario o contraseña incorrectos.", 
+                                "Error de Acceso", 
+                                JOptionPane.ERROR_MESSAGE);
+					}
+				}
 			}
 		});
 		
