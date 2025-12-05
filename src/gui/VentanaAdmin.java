@@ -6,13 +6,16 @@ import util.UIConstants;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -24,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.awt.event.ActionEvent;
 
 public class VentanaAdmin extends JFrame {
@@ -52,10 +56,34 @@ public class VentanaAdmin extends JFrame {
         JPanel panelNorte = new JPanel(new BorderLayout());
         panelNorte.setBackground(UIConstants.DFLY);
         panelNorte.setOpaque(true); 
+        contentPane.add(panelNorte, BorderLayout.NORTH);
         
-        JLabel lblTitulo = new JLabel(" AÑADIR NUEVO VUELO", SwingConstants.CENTER);
+        
+        JPanel panelLogoAdmin = new JPanel();
+        panelLogoAdmin.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));       
+        panelLogoAdmin.setBackground(UIConstants.DFLY);
+        panelLogoAdmin.setOpaque(true); 
+        panelNorte.add(panelLogoAdmin, BorderLayout.WEST);
+        
+        JLabel lblLogoAdmin = new JLabel();
+        try {
+            URL logoUrl = getClass().getResource("/resources/LogoDFly_Morado.png"); 
+            if (logoUrl != null) {
+                ImageIcon logoIcon = new ImageIcon(logoUrl);
+                Image img = logoIcon.getImage().getScaledInstance(80, -1, Image.SCALE_SMOOTH); 
+                lblLogoAdmin.setIcon(new ImageIcon(img));
+            } else {
+                lblLogoAdmin.setText("LOGO");
+            }
+        } catch (Exception e) {
+            lblLogoAdmin.setText("LOGO");
+            e.printStackTrace();
+        }
+        panelLogoAdmin.add(lblLogoAdmin);
+
+        JLabel lblTitulo = new JLabel(" AÑADIR VUELO", SwingConstants.CENTER);
         lblTitulo.setForeground(Color.WHITE);
-        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 20));
+        lblTitulo.setFont(new Font("Tahoma", Font.BOLD, 16));
         lblTitulo.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10)); 
         panelNorte.add(lblTitulo, BorderLayout.CENTER);
         
