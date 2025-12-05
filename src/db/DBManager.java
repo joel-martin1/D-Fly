@@ -1,6 +1,7 @@
 package db;
 
 import java.sql.Connection;
+import domain.Usuario;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -220,7 +221,7 @@ public class DBManager {
 				double precioDesde= rs.getDouble("precio_desde");
 				
 				Destino d= new Destino(id_destino, ciudad, pais, descripcion, urlImagen, precioDesde);
-				d.setPrecioDesde(precioDesde);
+				
 				
 				destinos.add(d);
 			}
@@ -250,27 +251,53 @@ public class DBManager {
         return nombres;
     }
 	
-	public static String autenticarUsuario(String email, String password) {
-	    String rol = null;
-	    String sql = "SELECT rol FROM Usuario WHERE email = ? AND password = ?";
+	public static Usuario autenticarUsuario(String email, String password) {
+	    Usuario usuario = null;
+	    String sql = "SELECT id_usuario, nombre, rol, descuento FROM Usuario WHERE email = ? AND password = ?";
+	    
+	    try (Connection conn = conectar();
+	            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	           
+	           pstmt.setString(1, email.trim());
+	           pstmt.setString(2, password.trim());
+	           
+	           try (ResultSet rs = pstmt.executeQuery()) {
+	               if (rs.next()) {
+	                   int id = rs.getInt("id_usuario");
+	                   String nombre = rs.getString("nombre");
+	                   String rol = rs.getString("rol");
+	                   double descuento = rs.getDouble("descuento");
+	                   
+	                   usuario = new Usuario(id, email, nombre, rol, descuento);
+	               }
+	           }
+	           
+	       } catch (SQLException e) {
+	           System.err.println("Error al autenticar el usuario: " + e.getMessage());
+	       }
+	       return usuario;
+	}
+	
+	public static boolean registrarNuevoCliente(String nombre, String email, String password) {
+	
+	    String sql = "INSERT INTO Usuario (email, password, nombre) VALUES (?, ?, ?)";
 	    
 	    try (Connection conn = conectar();
 	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
 	        
-	        pstmt.setString(1, email);
-	        pstmt.setString(2, password);
+	        pstmt.setString(1, email.trim());
+	        pstmt.setString(2, password.trim());
+	        pstmt.setString(3, nombre.trim());
 	        
-	        try (ResultSet rs = pstmt.executeQuery()) {
-	            if (rs.next()) {
-	                rol = rs.getString("rol");
-	            }
-	        }
+	        int filasAfectadas = pstmt.executeUpdate();
+	        return filasAfectadas > 0;
 	        
 	    } catch (SQLException e) {
-	        System.err.println("Error al autenticar el usuario: " + e.getMessage());
+	        System.err.println("Error al registrar nuevo cliente: " + e.getMessage());
+	        return false;
 	    }
-	    return rol;
 	}
+	
 	
 	public static boolean insertarNuevoVuelo(int idOrigen, int idDestino, String fechaSalida, double precio, String aerolinea) {
 	    String sql = "INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES (?, ?, ?, ?, ?)";

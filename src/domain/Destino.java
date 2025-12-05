@@ -16,6 +16,7 @@ public class Destino {
 		this.pais= pais;
 		this.descripcion= descripcion;
 		this.urlImagen= urlImagen;
+		this.precioDesde = precioDesde;
 		
 	}
 

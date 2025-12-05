@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 
 import util.UIConstants;
 import db.DBManager;
+import domain.Usuario;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -32,6 +33,8 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.net.URL;
 import java.awt.event.ActionEvent;
+
+//C:\Users\julen.mulero\git\D-Fly\D-Fly
 
 public class VentanaLoginRegistro extends JFrame {
 
@@ -156,6 +159,9 @@ public class VentanaLoginRegistro extends JFrame {
 				String email = textUsuario.getText();
 				String password = new String(pass.getPassword());
 				
+				email = email.trim();
+				password = password.trim();
+				
 				if (email.isEmpty()) {
 					JOptionPane.showMessageDialog(VentanaLoginRegistro.this, "El campo email no puede estar vacío","Error de Validación", JOptionPane.WARNING_MESSAGE);
 					return;
@@ -185,36 +191,45 @@ public class VentanaLoginRegistro extends JFrame {
 		            return;
 		        }
 				
-				String rolUsuario = db.DBManager.autenticarUsuario(email, password);
+				Usuario usuarioLogueado = db.DBManager.autenticarUsuario(email, password);
 				
-				if (rolUsuario != null) {
-					if ("ADMIN".equals(rolUsuario)) {
-						JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
-                                "Bienvenido, Administrador!", 
-                                "Acceso concedido", 
-                                JOptionPane.INFORMATION_MESSAGE);
-						
-						VentanaAdmin adminFrame = new VentanaAdmin();
-						adminFrame.setVisible(true);
-						
-						VentanaLoginRegistro.this.dispose();
-						
-						
-					} else if ("CLIENTE".equals(rolUsuario)) {
-						JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
-                                "Login de Cliente exitoso!", 
-                                "Acceso concedido", 
-                                JOptionPane.INFORMATION_MESSAGE);
-					}else {
-						JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
-                                "Usuario o contraseña incorrectos.", 
-                                "Error de Acceso", 
-                                JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			}
+				if (usuarioLogueado != null) {
+		            String rol = usuarioLogueado.getRol();
+
+		            if ("ADMIN".equals(rol)) {
+		                JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                              "Bienvenido, Administrador " + usuarioLogueado.getNombre(), 
+		                                              "Acceso Consedido", JOptionPane.INFORMATION_MESSAGE);
+		                
+		                VentanaAdmin adminFrame = new VentanaAdmin();
+		                adminFrame.setVisible(true);
+		                VentanaLoginRegistro.this.dispose();
+
+		            } else if ("CLIENTE".equals(rol)) {
+		                JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                              "Bienvenido, cliente " + usuarioLogueado.getNombre() + 
+		                                              ". Descuento: " + (usuarioLogueado.getDescuento() * 100) + "%", 
+		                                              "Acceso Consedido", JOptionPane.INFORMATION_MESSAGE);
+		                
+		               VentanaPrincipal clienteVentana = new VentanaPrincipal();
+		               clienteVentana.setVisible(true);
+		                
+		                VentanaLoginRegistro.this.dispose();
+		                
+		            } else {
+		                 JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                               "Rol desconocido. Contacte con soporte.", 
+		                                               "Error de Rol", JOptionPane.ERROR_MESSAGE);
+		            }
+		            
+		        } else {
+		            // Si usuarioLogueado es null, las credenciales son incorrectas
+		             JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+		                                           "Usuario o contraseña incorrectos.", 
+		                                           "Fallo de Autenticación", JOptionPane.ERROR_MESSAGE);
+		        }
+		    }
 		});
-		
 		
 		gbc = new GridBagConstraints(); 
 		gbc.insets = new Insets(8, 5, 8, 5);
@@ -374,13 +389,22 @@ public class VentanaLoginRegistro extends JFrame {
 		panelFormularioRegistro.add(btnRegistrarse, gbc1);
 		btnRegistrarse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String nombre = textNombreUsuario.getText();
+				String email1 = textEmailRegistro.getText();
 				char[] pass1 = passReg.getPassword();
 				char[] pass2 = passConfirmar.getPassword();
-				String email1 = textEmailRegistro.getText();
+				String password = new String(pass1);
 				
-				if (pass1.length < 6) {
+				if (nombre.isEmpty() || email1.isEmpty() || pass1.length == 0 || pass2.length == 0) {
+				    JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+				                                  "Todos los campos deben estar completos.", 
+				                                  "Error de Validación", JOptionPane.WARNING_MESSAGE);
+				    return;
+				}
+				
+				if (pass1.length < 5) {
 		            JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
-		                                          "La contraseña debe tener al menos 6 caracteres.", 
+		                                          "La contraseña debe tener al menos 5 caracteres.", 
 		                                          "Contraseña Insegura", 
 		                                          JOptionPane.WARNING_MESSAGE);
 		            return;
@@ -394,13 +418,7 @@ public class VentanaLoginRegistro extends JFrame {
 		            return;
 		        }
 				
-				if (pass1.length == 0 || textNombreUsuario.getText().isEmpty()) {
-		             JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
-		                                          "Ningún campo puede estar vacío.", 
-		                                          "Error de Validación", 
-		                                          JOptionPane.WARNING_MESSAGE);
-		            return;
-		        }
+				
 				
 				if (!email1.matches("^[\\w.-]+@[a-zA-Z\\d.-]+\\.[a-zA-Z]{2,6}$")) {
 		            JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
@@ -408,6 +426,28 @@ public class VentanaLoginRegistro extends JFrame {
 		                                          "Error de Validación", 
 		                                          JOptionPane.WARNING_MESSAGE);
 		            return;
+				}
+				
+				boolean exito = DBManager.registrarNuevoCliente(nombre, email1, password);
+				
+				if (exito) {
+				    JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+				                                  "¡Registro completado! Ya puedes iniciar sesión.", 
+				                                  "Registro Exitoso", 
+				                                  JOptionPane.INFORMATION_MESSAGE);
+				    
+				    textNombreUsuario.setText("");
+				    textEmailRegistro.setText("");
+				    passReg.setText("");
+				    passConfirmar.setText("");
+
+				    cl.show(getContentPane(), "LOGIN"); 
+
+				} else {
+				    JOptionPane.showMessageDialog(VentanaLoginRegistro.this, 
+				                                  "Error al registrar. El email ya podría estar en uso o hubo un fallo de BD.", 
+				                                  "Fallo en Registro", 
+				                                  JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
