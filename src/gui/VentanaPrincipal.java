@@ -34,7 +34,12 @@ public class VentanaPrincipal extends JFrame {
 	private Destino[] destinosRec= new Destino[4];
 	private JPanel panelDestinosGrid;
 	
-	DBManager cargaDestinos= new DBManager();
+	private AutocompleteTextField txtOrigen;
+    private AutocompleteTextField txtDestino; // o txtUbicacion
+    
+    DBManager cargaDestinos = new DBManager();
+	
+	
 
     public VentanaPrincipal() {
         setTitle("D-Fly");
@@ -131,19 +136,36 @@ public class VentanaPrincipal extends JFrame {
         
         searchPanelCompleto.add(panelPestanas, BorderLayout.NORTH);
 
-        //Formulario de búsqueda horizontal (Ubicación, Fecha, Nº Per)
+       
+        
+     // Código NUEVO - Origen y Destino
+
+     // Panel de búsqueda con Origen y Destino
         JPanel panelFormulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         panelFormulario.setOpaque(false);
 
-        AutocompleteTextField txtUbicacion= new AutocompleteTextField(25);
-        txtUbicacion.setSugerencias(cargaDestinos.getNombresDestinos());
-        //JComboBox de Fecha Ida
+     // CAMPO DE ORIGEN 
+        txtOrigen = new AutocompleteTextField(15);
+        txtOrigen.setSugerencias(cargaDestinos.getNombresDestinos());
+        panelFormulario.add(new JLabel("Origen:")).setForeground(Color.WHITE);
+        panelFormulario.add(txtOrigen);
+
+     // CAMPO DE DESTINO
+        txtDestino = new AutocompleteTextField(15);
+        txtDestino.setSugerencias(cargaDestinos.getNombresDestinos());
+        panelFormulario.add(new JLabel("Destino:")).setForeground(Color.WHITE);
+        panelFormulario.add(txtDestino);
+
+     // RESTO DE CAMPOS (fechas, personas, etc.) 
         JComboBox<Integer> cbmDiaIda = new JComboBox<Integer>(); 
         JComboBox<String> cbmMesIda = new JComboBox<String>(); 
         JComboBox<Integer> cbmAnioIda = new JComboBox<Integer>(); 
-        
-        //Obtenemos el día actual
+
+     
         int diaActual = LocalDate.now().getDayOfMonth();
+     
+
+        
         int mesActual= LocalDate.now().getMonthValue();
         
         //Rellenamos el JComboBox con todos los días
@@ -232,40 +254,55 @@ public class VentanaPrincipal extends JFrame {
         btnBuscar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         btnBuscar.addActionListener(e -> {
-            String ciudadDestino = txtUbicacion.getText().trim();
+            String ciudadOrigen = txtOrigen.getText().trim();
+            String ciudadDestino = txtDestino.getText().trim();
             
-            if (ciudadDestino.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Ingresa un destino");
+            // Validación
+            if (ciudadOrigen.isEmpty() || ciudadDestino.isEmpty()) {
+                JOptionPane.showMessageDialog(this, 
+                    "Completa ambos campos: Origen y Destino", 
+                    "Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             
-            // 1. Buscar ID del destino en la BD
+            if (ciudadOrigen.equalsIgnoreCase(ciudadDestino)) {
+                JOptionPane.showMessageDialog(this, 
+                    "El origen y destino no pueden ser iguales", 
+                    "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            // IDs
+            int idOrigen = DBManager.getDestinoIdByCiudad(ciudadOrigen);
             int idDestino = DBManager.getDestinoIdByCiudad(ciudadDestino);
+            
+            if (idOrigen == -1) {
+                JOptionPane.showMessageDialog(this, "Origen no encontrado: " + ciudadOrigen);
+                return;
+            }
             if (idDestino == -1) {
-                JOptionPane.showMessageDialog(this, "Destino no encontrado");
+                JOptionPane.showMessageDialog(this, "Destino no encontrado: " + ciudadDestino);
                 return;
             }
             
-            // 2. Construir fecha
+            // Fecha
             String fecha = cbmAnioIda.getSelectedItem() + "-" + 
                            String.format("%02d", cbmMesIda.getSelectedIndex() + 1) + "-" + 
                            String.format("%02d", cbmDiaIda.getSelectedItem());
             
-            // 3. Consultar vuelos REALES de la BD
-            List<Vuelo> vuelos = DBManager.buscarVuelos(1, idDestino, fecha + "%");
+            // Buscar
+            List<Vuelo> vuelos = DBManager.buscarVuelos(idOrigen, idDestino, fecha + "%");
             
-            // 4. Obtener destinos para la ventana
-            Destino origen = DBManager.getDestinoById(1); // Donosti
+            // Obtener objetos
+            Destino origen = DBManager.getDestinoById(idOrigen);
             Destino destino = DBManager.getDestinoById(idDestino);
             
-            // 5. Abrir ventana
             VentanaResultadoVuelos ventana = new VentanaResultadoVuelos(vuelos, origen, destino);
             ventana.setVisible(true);
             this.dispose();
         });
 
-        panelFormulario.add(new JLabel("Ubicación:")).setForeground(Color.WHITE);
-        panelFormulario.add(txtUbicacion);
+        
         panelFormulario.add(new JLabel("Fecha de Ida:")).setForeground(Color.WHITE); 
         panelFormulario.add(panelFechaIda); 
         
