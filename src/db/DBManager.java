@@ -8,7 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
+import java.util.List;
+import domain.Vuelo;
+import domain.Destino;
 import domain.Destino;
 
 public class DBManager {
@@ -250,6 +252,81 @@ public class DBManager {
         }
         return nombres;
     }
+	public static int getDestinoIdByCiudad(String ciudad) {
+	    String sql = "SELECT id_destino FROM Destino WHERE ciudad LIKE ?";
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setString(1, "%" + ciudad + "%");
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            return rs.getInt("id_destino");
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error buscando destino: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return -1; 
+	}
+
+	public static List<Vuelo> buscarVuelos(int idOrigen, int idDestino, String fecha) {
+	    List<Vuelo> vuelos = new ArrayList<>();
+	    String sql = "SELECT * FROM Vuelo WHERE id_origen = ? AND id_destino = ? AND fecha_salida LIKE ?";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setInt(1, idOrigen);
+	        pstmt.setInt(2, idDestino);
+	        pstmt.setString(3, fecha + "%"); // % para coincidir cualquier hora
+	        
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        while (rs.next()) {
+	            Vuelo vuelo = new Vuelo(
+	                rs.getInt("id_vuelo"),
+	                rs.getInt("id_origen"),
+	                rs.getInt("id_destino"),
+	                rs.getString("fecha_salida"),
+	                rs.getString("fecha_llegada"),
+	                rs.getDouble("precio"),
+	                rs.getString("aerolinea")
+	            );
+	            vuelos.add(vuelo);
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error buscando vuelos: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return vuelos;
+	}
+
+	public static Destino getDestinoById(int id) {
+	    String sql = "SELECT * FROM Destino WHERE id_destino = ?";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setInt(1, id);
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            return new Destino(
+	                rs.getInt("id_destino"),
+	                rs.getString("ciudad"),
+	                rs.getString("pais"),
+	                rs.getString("descripcion"),
+	                rs.getString("url_imagen"),
+	                0.0
+	            );
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error obteniendo destino: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
 	
 	public static Usuario autenticarUsuario(String email, String password) {
 	    Usuario usuario = null;

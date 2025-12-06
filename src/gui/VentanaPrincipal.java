@@ -231,18 +231,34 @@ public class VentanaPrincipal extends JFrame {
         btnBuscar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnBuscar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // busqueda de vuelos
         btnBuscar.addActionListener(e -> {
-            // 1. Datos de PRUEBA temporales
-            List<Vuelo> vuelos = new ArrayList<>();
-            vuelos.add(new Vuelo(1, 1, 2, "2025-12-01 10:00", "2025-12-01 16:00", 450.0, "D-Fly Air"));
-            vuelos.add(new Vuelo(2, 1, 2, "2025-12-01 14:30", "2025-12-01 20:15", 380.0, "EuroWing"));
+            String ciudadDestino = txtUbicacion.getText().trim();
             
-            // 2 destinos de ejemplos
-            Destino origen = new Destino(1, "Donosti", "España", "", "/resources/donosti.jpg", 0);
-            Destino destino = new Destino(2, "Nueva York", "EEUU", "", "/resources/newyork.jpg", 0);
+            if (ciudadDestino.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Ingresa un destino");
+                return;
+            }
             
-            // abrir ventana
+            // 1. Buscar ID del destino en la BD
+            int idDestino = DBManager.getDestinoIdByCiudad(ciudadDestino);
+            if (idDestino == -1) {
+                JOptionPane.showMessageDialog(this, "Destino no encontrado");
+                return;
+            }
+            
+            // 2. Construir fecha
+            String fecha = cbmAnioIda.getSelectedItem() + "-" + 
+                           String.format("%02d", cbmMesIda.getSelectedIndex() + 1) + "-" + 
+                           String.format("%02d", cbmDiaIda.getSelectedItem());
+            
+            // 3. Consultar vuelos REALES de la BD
+            List<Vuelo> vuelos = DBManager.buscarVuelos(1, idDestino, fecha + "%");
+            
+            // 4. Obtener destinos para la ventana
+            Destino origen = DBManager.getDestinoById(1); // Donosti
+            Destino destino = DBManager.getDestinoById(idDestino);
+            
+            // 5. Abrir ventana
             VentanaResultadoVuelos ventana = new VentanaResultadoVuelos(vuelos, origen, destino);
             ventana.setVisible(true);
             this.dispose();
