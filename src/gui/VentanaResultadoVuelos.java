@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Cursor;
+import main.SesionManager;
 
 public class VentanaResultadoVuelos extends JFrame{
 	private JPanel panelVuelos;
@@ -122,13 +123,32 @@ BorderFactory.createLineBorder(UIConstants.DFLY,1),
                          tarjeta.add(lblPrecio, gbc);
                          
                          
+                      
                          tarjeta.addMouseListener(new MouseAdapter() {
-                             
                              public void mouseClicked(MouseEvent e) {
-                                 JOptionPane.showMessageDialog(VentanaResultadoVuelos.this,
-                                     "vuelo seleccionado: " + vuelo.getAerolinea(),
-                                     "Éxito",
-                                     JOptionPane.INFORMATION_MESSAGE);
+                                 // Verifica si hay usuario logueado
+                                 if (!SesionManager.isLoggedIn()) {
+                                     JOptionPane.showMessageDialog(VentanaResultadoVuelos.this,
+                                         "Debes iniciar sesión para continuar",
+                                         "Login requerido",
+                                         JOptionPane.WARNING_MESSAGE);
+                                     
+                                     // GUARDA el vuelo seleccionado para después
+                                     SesionManager.setVueloPendiente(vuelo);
+                                     SesionManager.setOrigenPendiente(origen);
+                                     SesionManager.setDestinoPendiente(destino);
+                                     
+                                     // Abre login
+                                     VentanaLoginRegistro ventanaLogin = new VentanaLoginRegistro();
+                                     ventanaLogin.setVisible(true);
+                                     dispose(); 
+                                     return;
+                                 }
+                                 
+                                 // Si está logueado → PAGO DIRECTO
+                                 VentanaPago ventanaPago = new VentanaPago(vuelo, SesionManager.getUsuario());
+                                 ventanaPago.setVisible(true);
+                                 dispose(); 
                              }
                          });
                          
