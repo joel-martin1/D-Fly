@@ -1,22 +1,19 @@
 package db;
 
 import java.sql.Connection;
+import domain.Usuario;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
+import java.util.List;
+import domain.Vuelo;
+import domain.Destino;
 import domain.Destino;
 
-
-
-
-
 public class DBManager {
-	
-	ArrayList<Destino> destinos= new ArrayList<Destino>();
 	
 	private static final String URL= "jdbc:sqlite:db/dfly.db";
 	
@@ -24,7 +21,6 @@ public class DBManager {
 		Connection conn= null;
 		try {
 			Class.forName("org.sqlite.JDBC");
-
 			conn= DriverManager.getConnection(URL);
 		}catch(SQLException | ClassNotFoundException e) {
 			System.err.println("Error al conectar a la BBDD: "+ e.getMessage());
@@ -87,6 +83,18 @@ public class DBManager {
 	            "    FOREIGN KEY(id_hotel) REFERENCES Hotel(id_hotel)" +
 	            ");";
 	    
+	    String sqlTarjeta=
+	    		"CREATE TABLE IF NOT EXISTS Tarjeta (" +
+	    	            "    id_tarjeta INTEGER PRIMARY KEY AUTOINCREMENT," +
+	    	            "    id_usuario INTEGER NOT NULL," +
+	    	            "    numero_tarjeta TEXT NOT NULL," +
+	    	            "    nombre_titular TEXT NOT NULL," +
+	    	            "    fecha_caducidad TEXT," +
+	    	            "    cvv INTEGER," +
+	    	            "    saldo REAL DEFAULT 0.0," +
+	    	            "    FOREIGN KEY(id_usuario) REFERENCES Usuario(id_usuario)" +
+	    	            ");";
+	    
 	    try(Connection conn= conectar();
 	    	Statement stmt= conn.createStatement()){
 	    	
@@ -95,23 +103,23 @@ public class DBManager {
 	    	stmt.execute(sqlVuelo);
 	    	stmt.execute(sqlHotel);
 	    	stmt.execute(sqlReserva);
+	    	stmt.execute(sqlTarjeta);
 	    	
 	    }catch(SQLException e) {
 	    	System.err.println("Error al crear las tablas: "+e.getMessage());
 	    }
-				
 	}
 	
 	/*
 	 * BORRAR TODOS LOS DATOS, SOLO USAR PARA PRUEBAS DE APLICACION O PARA REINICIAR LA BASE DE DATOS
 	 */
-	
 	public static void reinicializarDatos() {
 		try(Connection conn= conectar();
 			Statement stmt= conn.createStatement()) {
 			
-			//Borramos los datos que haya en cada tabla
+			// 1. Limpiar Tablas
             stmt.execute("DELETE FROM Reserva;");
+            stmt.execute("DELETE FROM Tarjeta;");
             stmt.execute("DELETE FROM Vuelo;");
             stmt.execute("DELETE FROM Hotel;");
             stmt.execute("DELETE FROM Destino;");
@@ -119,52 +127,90 @@ public class DBManager {
             stmt.execute("DELETE FROM sqlite_sequence WHERE name IN ('Usuario', 'Destino', 'Vuelo', 'Hotel', 'Reserva');");
             System.out.println("Tablas reseteadas");
 
-            /*
-             * Insertamos 4 datos inciales
-             */
-            
             String sqlUsuarios= 
                 "INSERT INTO Usuario (email, password, nombre, rol, descuento) VALUES " +
                 "('admin@dfly.com', 'admin123', 'Admin D-Fly', 'ADMIN', 0.15)," +
                 "('ana@test.com', 'pass1', 'Ana García', 'CLIENTE', 0.0)," +
                 "('bruno@test.com', 'pass2', 'Bruno Solis', 'CLIENTE', 0.05)," +
-                "('carla@test.com', 'pass3', 'Carla Diaz', 'CLIENTE', 0.0);";
+                "('carla@test.com', 'pass3', 'Carla Diaz', 'CLIENTE', 0.0)," +
+                "('david@test.com', 'pass4', 'David M', 'CLIENTE', 0.10)," +
+                "('elena@test.com', 'pass5', 'Elena R', 'CLIENTE', 0.0);";
             stmt.execute(sqlUsuarios);
 
             String sqlDestinos=
                 "INSERT INTO Destino (ciudad, pais, descripcion, url_imagen) VALUES " +
-                "('Donosti', 'España', 'Zinemaldi', '/resources/donosti.jpg')," +
-                "('Nueva York', 'EEUU', 'La gran manzana', '/resources/newyork.jpg')," +
-                "('Tokio', 'Japon', 'Pais del sol naciente', '/resources/tokio.jpg')," +
-                "('Dubai', 'UAE', 'Vive como un millonario', '/resources/dubai.jpg');";
+                "('Donosti', 'España', 'Zinemaldi y Gastronomía', '/resources/donosti.jpg')," + 
+                "('Nueva York', 'EEUU', 'La gran manzana', '/resources/newyork.jpg')," +         
+                "('Tokio', 'Japon', 'Pais del sol naciente', '/resources/tokio.jpg')," +         
+                "('Dubai', 'UAE', 'Vive como un millonario', '/resources/dubai.jpg')," +         
+                "('Londres', 'Reino Unido', 'Cultura y tradición', '/resources/london.jpg')," +  
+                "('París', 'Francia', 'La ciudad del amor', '/resources/paris.jpg')," +          
+                "('Roma', 'Italia', 'Historia viva', '/resources/roma.jpg')," +                  
+                "('Sídney', 'Australia', 'Aventura en Oceanía', '/resources/sydney.jpg');";      
             stmt.execute(sqlDestinos);
 
             String sqlVuelos=
                 "INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
-                "(1, 2, '2025-12-01 10:00', 950.0, 'D-Fly Air')," +        // Donosti (1) -> Nueva York (2)
-                "(2, 3, '2025-12-05 14:30', 120.0, 'EuroWing')," +         // Nueva York (2) -> Tokio (3)
-                "(4, 1, '2025-12-10 08:00', 1100.0, 'Japan Airlines')," +  // Dubai (4) -> Donosti (1)
-                "(3, 4, '2025-12-15 11:00', 600.0, 'Iberia');";          // Tokio (3) -> Dubai (4)
+                // Desde Donosti
+                "(1, 2, '2025-12-01 10:00', 950.0, 'D-Fly Air')," +        
+                "(1, 5, '2025-12-02 09:00', 120.0, 'Iberia Express')," +   
+                "(1, 6, '2025-12-03 11:30', 90.0, 'Air France')," +        
+                
+                // Desde NY
+                "(2, 3, '2025-12-05 14:30', 1200.0, 'JAL')," +             
+                "(2, 5, '2025-12-06 18:00', 450.0, 'British Airways')," +  
+                
+                // Desde Dubai
+                "(4, 1, '2025-12-10 08:00', 1100.0, 'Emirates')," +        
+                "(4, 8, '2025-12-12 22:00', 800.0, 'Qantas')," +           
+                
+                // Desde Tokio
+                "(3, 4, '2025-12-15 11:00', 600.0, 'Qatar Airways')," +    
+                "(3, 8, '2025-12-16 09:00', 750.0, 'ANA')," +              
+                
+                // Desde Europa
+                "(5, 2, '2025-12-20 10:00', 400.0, 'Virgin')," +           
+                "(6, 7, '2025-12-21 15:00', 80.0, 'Ryanair')," +           
+                "(7, 4, '2025-12-22 13:00', 350.0, 'Alitalia');";          
             stmt.execute(sqlVuelos);
 
+            
             String sqlHoteles=
                 "INSERT INTO Hotel (id_destino, nombre_hotel, precio_noche) VALUES " +
-                "(1, 'Maria Cristina', 220.0)," +      //Hotel en Donosti(1)
-                "(2, 'Innside', 180.0)," +             //Hotel en Nueva York(2)
-                "(3, 'Manga art Hotel', 234)," +      //Hotel en Tokio (3)
-                "(4, 'Burj Al Arab', 500);";           //Hotel en Dubai (4)
+                "(1, 'Maria Cristina', 220.0)," +     
+                "(1, 'Pension lo que sea', 60.0)," +  
+                "(2, 'Innside NY', 180.0)," +         
+                "(2, 'Plaza Hotel', 500.0)," +        
+                "(3, 'Manga art Hotel', 90.0)," +     
+                "(4, 'Burj Al Arab', 900.0)," +       
+                "(5, 'The Ritz London', 400.0)," +     
+                "(5, 'City Hostel', 40.0)," +          
+                "(6, 'Le Meurice', 350.0)," +          
+                "(7, 'Hotel Colosseum', 110.0)," +     
+                "(8, 'Sydney Opera View', 250.0);";    
             stmt.execute(sqlHoteles);
 
+          
             String sqlReservas=
                 "INSERT INTO Reserva (id_usuario, id_vuelo, id_hotel, fecha_reserva, precio_total_pagado) VALUES " +
-                "(2, 1, NULL, '2025-11-10 09:00', 950.0)," +  // Ana (2) compra Vuelo 1
-                "(3, NULL, 2, '2025-11-11 11:00', 180.0)," +  // Bruno (3) reserva Hotel 2
-                "(4, 3, 1, '2025-11-12 14:00', 1320.0)," + // Carla (4) compra Vuelo 3 Y Hotel 1
-                "(2, 4, NULL, '2025-11-15 17:00', 600.0);";  // Ana (2) compra Vuelo 4
+                "(2, 1, NULL, '2025-11-10 09:00', 950.0)," + 
+                "(3, NULL, 2, '2025-11-11 11:00', 180.0)," + 
+                "(4, 3, 1, '2025-11-12 14:00', 1320.0)," + 
+                "(2, 4, NULL, '2025-11-15 17:00', 600.0)," +
+                "(5, 10, 9, '2025-11-18 10:00', 430.0);"; // David compró vuelo a NY + hotel
             stmt.execute(sqlReservas);
             
-            System.out.println("Datos iniciales insertados");
-			
+            String sqlTarjetas = 
+                    "INSERT INTO Tarjeta (id_usuario, numero_tarjeta, nombre_titular, fecha_caducidad, cvv, saldo) VALUES " +
+                    "(2, '4545111122223333', 'ANA GARCIA', '12/28', 123, 5000.0)," +      // Ana (Tiene dinero)
+                    "(3, '5500999988887777', 'BRUNO SOLIS', '05/26', 456, 150.0)," +      // Bruno (Pobre, solo 150€)
+                    "(4, '4111222233334444', 'CARLA DIAZ', '01/30', 789, 10000.0)," +     // Carla (Rica)
+                    "(5, '3400123456789012', 'DAVID M', '09/27', 999, 2500.0);"+          // David (Normal)
+                    "(6, '7891236571027631', 'ELENA R, '09/30, 951, 4600.0);";
+            		
+                stmt.execute(sqlTarjetas);
+            
+            System.out.println("Datos masivos iniciales insertados correctamente.");
 			
 		}catch(SQLException e) {
 			System.err.println("No se han podido inicializar los datos");
@@ -199,11 +245,10 @@ public class DBManager {
 				double precioDesde= rs.getDouble("precio_desde");
 				
 				Destino d= new Destino(id_destino, ciudad, pais, descripcion, urlImagen, precioDesde);
-				d.setPrecioDesde(precioDesde);
+				
 				
 				destinos.add(d);
 			}
-			
 			
 		}catch(SQLException e) {
 			System.err.println("No se pudo consultar los destinos recomendados");
@@ -213,5 +258,183 @@ public class DBManager {
 		return destinos;
 	}
 	
+	public ArrayList<String> getNombresDestinos() {
+        ArrayList<String> nombres = new ArrayList<>();
+        String sql = "SELECT ciudad, pais FROM Destino";
 
+        try (Connection conn = conectar();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                nombres.add(rs.getString("ciudad"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return nombres;
+    }
+	public static int getDestinoIdByCiudad(String ciudad) {
+	    String sql = "SELECT id_destino FROM Destino WHERE ciudad LIKE ?";
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setString(1, "%" + ciudad + "%");
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            return rs.getInt("id_destino");
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error buscando destino: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return -1; 
+	}
+
+	public static List<Vuelo> buscarVuelos(int idOrigen, int idDestino, String fecha) {
+	    List<Vuelo> vuelos = new ArrayList<>();
+	    String sql = "SELECT * FROM Vuelo WHERE id_origen = ? AND id_destino = ? AND fecha_salida LIKE ?";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setInt(1, idOrigen);
+	        pstmt.setInt(2, idDestino);
+	        pstmt.setString(3, fecha + "%"); // % para coincidir cualquier hora
+	        
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        while (rs.next()) {
+	            Vuelo vuelo = new Vuelo(
+	                rs.getInt("id_vuelo"),
+	                rs.getInt("id_origen"),
+	                rs.getInt("id_destino"),
+	                rs.getString("fecha_salida"),
+	                rs.getString("fecha_llegada"),
+	                rs.getDouble("precio"),
+	                rs.getString("aerolinea")
+	            );
+	            vuelos.add(vuelo);
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error buscando vuelos: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return vuelos;
+	}
+
+	public static Destino getDestinoById(int id) {
+	    String sql = "SELECT * FROM Destino WHERE id_destino = ?";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setInt(1, id);
+	        ResultSet rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            return new Destino(
+	                rs.getInt("id_destino"),
+	                rs.getString("ciudad"),
+	                rs.getString("pais"),
+	                rs.getString("descripcion"),
+	                rs.getString("url_imagen"),
+	                0.0
+	            );
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error obteniendo destino: " + e.getMessage());
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+	
+	public static Usuario autenticarUsuario(String email, String password) {
+	    Usuario usuario = null;
+	    String sql = "SELECT id_usuario, nombre, rol, descuento FROM Usuario WHERE email = ? AND password = ?";
+	    
+	    try (Connection conn = conectar();
+	            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	           
+	           pstmt.setString(1, email.trim());
+	           pstmt.setString(2, password.trim());
+	           
+	           try (ResultSet rs = pstmt.executeQuery()) {
+	               if (rs.next()) {
+	                   int id = rs.getInt("id_usuario");
+	                   String nombre = rs.getString("nombre");
+	                   String rol = rs.getString("rol");
+	                   double descuento = rs.getDouble("descuento");
+	                   
+	                   usuario = new Usuario(id, email, nombre, rol, descuento);
+	               }
+	           }
+	           
+	       } catch (SQLException e) {
+	           System.err.println("Error al autenticar el usuario: " + e.getMessage());
+	       }
+	       return usuario;
+	}
+	
+	public static boolean registrarNuevoCliente(String nombre, String email, String password) {
+	
+	    String sql = "INSERT INTO Usuario (email, password, nombre) VALUES (?, ?, ?)";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setString(1, email.trim());
+	        pstmt.setString(2, password.trim());
+	        pstmt.setString(3, nombre.trim());
+	        
+	        int filasAfectadas = pstmt.executeUpdate();
+	        return filasAfectadas > 0;
+	        
+	    } catch (SQLException e) {
+	        System.err.println("Error al registrar nuevo cliente: " + e.getMessage());
+	        return false;
+	    }
+	}
+	
+	
+	public static boolean insertarNuevoVuelo(int idOrigen, int idDestino, String fechaSalida, double precio, String aerolinea) {
+	    String sql = "INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES (?, ?, ?, ?, ?)";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setInt(1, idOrigen);
+	        pstmt.setInt(2, idDestino);
+	        pstmt.setString(3, fechaSalida); 
+	        pstmt.setDouble(4, precio);
+	        pstmt.setString(5, aerolinea);
+	        
+	        int filasAfectadas = pstmt.executeUpdate();
+	        return filasAfectadas > 0;
+	        
+	    } catch (SQLException e) {
+	        System.err.println("Error al insertar un nuevo vuelo: " + e.getMessage());
+	        return false;
+	    }
+	}
+	
+	//Id de destino a partir de nombre
+	public static int obtenerIdDestinoPorNombre(String ciudad) {
+	    String sql = "SELECT id_destino FROM Destino WHERE ciudad = ?";
+	    
+	    try (Connection conn = conectar();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        
+	        pstmt.setString(1, ciudad);
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getInt("id_destino");
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error al obtener el ID del destino: " + e.getMessage());
+	    }
+	    return -1; 
+	}
 }

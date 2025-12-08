@@ -31,7 +31,7 @@ public class Main {
             
             //Simulamos un tiempo de carga de 5 segundos
             
-            Timer tiempoCarga = new Timer(5000, e -> {
+            Timer tiempoCarga = new Timer(1000, e -> {
             	ventanaCarga.ocultar();
             	VentanaPrincipal ventana = new VentanaPrincipal();
             	ventana.setVisible(true);

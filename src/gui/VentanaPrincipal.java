@@ -1,14 +1,18 @@
-//TODO: Cambiar los botones selectores, por botones que cambien de color depende del seleccionado (Vuelo, Alojamiento, Aloj+Vuelo)
 package gui;
 
 import util.UIConstants; //Colores
 
+import javax.swing.text.AttributeSet;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 import db.DBManager;
 
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.time.LocalDate;
@@ -18,7 +22,8 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.List;
 
-
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
 import domain.*;
 import gui.VentanaResultadoVuelos;
@@ -29,7 +34,12 @@ public class VentanaPrincipal extends JFrame {
 	private Destino[] destinosRec= new Destino[4];
 	private JPanel panelDestinosGrid;
 	
-	DBManager cargaDestinos= new DBManager();
+	private AutocompleteTextField txtOrigen;
+    private AutocompleteTextField txtDestino; // o txtUbicacion
+    
+    DBManager cargaDestinos = new DBManager();
+	
+	
 
     public VentanaPrincipal() {
         setTitle("D-Fly");
@@ -126,18 +136,36 @@ public class VentanaPrincipal extends JFrame {
         
         searchPanelCompleto.add(panelPestanas, BorderLayout.NORTH);
 
-        //Formulario de búsqueda horizontal (Ubicación, Fecha, Nº Per)
+       
+        
+     // Código NUEVO - Origen y Destino
+
+     // Panel de búsqueda con Origen y Destino
         JPanel panelFormulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         panelFormulario.setOpaque(false);
 
-        JTextField txtUbicacion = new JTextField(25);
-        //JComboBox de Fecha Ida
+     // CAMPO DE ORIGEN 
+        txtOrigen = new AutocompleteTextField(15);
+        txtOrigen.setSugerencias(cargaDestinos.getNombresDestinos());
+        panelFormulario.add(new JLabel("Origen:")).setForeground(Color.WHITE);
+        panelFormulario.add(txtOrigen);
+
+     // CAMPO DE DESTINO
+        txtDestino = new AutocompleteTextField(15);
+        txtDestino.setSugerencias(cargaDestinos.getNombresDestinos());
+        panelFormulario.add(new JLabel("Destino:")).setForeground(Color.WHITE);
+        panelFormulario.add(txtDestino);
+
+     // RESTO DE CAMPOS (fechas, personas, etc.) 
         JComboBox<Integer> cbmDiaIda = new JComboBox<Integer>(); 
         JComboBox<String> cbmMesIda = new JComboBox<String>(); 
         JComboBox<Integer> cbmAnioIda = new JComboBox<Integer>(); 
-        
-        //Obtenemos el día actual
+
+     
         int diaActual = LocalDate.now().getDayOfMonth();
+     
+
+        
         int mesActual= LocalDate.now().getMonthValue();
         
         //Rellenamos el JComboBox con todos los días
@@ -225,25 +253,56 @@ public class VentanaPrincipal extends JFrame {
         btnBuscar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnBuscar.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // busqueda de vuelos
         btnBuscar.addActionListener(e -> {
-            // 1. Datos de PRUEBA temporales
-            List<Vuelo> vuelos = new ArrayList<>();
-            vuelos.add(new Vuelo(1, 1, 2, "2025-12-01 10:00", "2025-12-01 16:00", 450.0, "D-Fly Air"));
-            vuelos.add(new Vuelo(2, 1, 2, "2025-12-01 14:30", "2025-12-01 20:15", 380.0, "EuroWing"));
+            String ciudadOrigen = txtOrigen.getText().trim();
+            String ciudadDestino = txtDestino.getText().trim();
             
-            // 2 destinos de ejemplos
-            Destino origen = new Destino(1, "Donosti", "España", "", "/resources/donosti.jpg", 0);
-            Destino destino = new Destino(2, "Nueva York", "EEUU", "", "/resources/newyork.jpg", 0);
+            // Validación
+            if (ciudadOrigen.isEmpty() || ciudadDestino.isEmpty()) {
+                JOptionPane.showMessageDialog(this, 
+                    "Completa ambos campos: Origen y Destino", 
+                    "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             
-            // abrir ventana
+            if (ciudadOrigen.equalsIgnoreCase(ciudadDestino)) {
+                JOptionPane.showMessageDialog(this, 
+                    "El origen y destino no pueden ser iguales", 
+                    "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            // IDs
+            int idOrigen = DBManager.getDestinoIdByCiudad(ciudadOrigen);
+            int idDestino = DBManager.getDestinoIdByCiudad(ciudadDestino);
+            
+            if (idOrigen == -1) {
+                JOptionPane.showMessageDialog(this, "Origen no encontrado: " + ciudadOrigen);
+                return;
+            }
+            if (idDestino == -1) {
+                JOptionPane.showMessageDialog(this, "Destino no encontrado: " + ciudadDestino);
+                return;
+            }
+            
+            // Fecha
+            String fecha = cbmAnioIda.getSelectedItem() + "-" + 
+                           String.format("%02d", cbmMesIda.getSelectedIndex() + 1) + "-" + 
+                           String.format("%02d", cbmDiaIda.getSelectedItem());
+            
+            // Buscar
+            List<Vuelo> vuelos = DBManager.buscarVuelos(idOrigen, idDestino, fecha + "%");
+            
+            // Obtener objetos
+            Destino origen = DBManager.getDestinoById(idOrigen);
+            Destino destino = DBManager.getDestinoById(idDestino);
+            
             VentanaResultadoVuelos ventana = new VentanaResultadoVuelos(vuelos, origen, destino);
             ventana.setVisible(true);
             this.dispose();
         });
 
-        panelFormulario.add(new JLabel("Ubicación:")).setForeground(Color.WHITE);
-        panelFormulario.add(txtUbicacion);
+        
         panelFormulario.add(new JLabel("Fecha de Ida:")).setForeground(Color.WHITE); 
         panelFormulario.add(panelFechaIda); 
         
@@ -338,5 +397,77 @@ public class VentanaPrincipal extends JFrame {
         	}	
         });
         hiloRec.start();
+    }
+    private class AutocompleteTextField extends JTextField{
+    	private ArrayList<String> sugerencias;
+    	private boolean isDeleting;
+    	
+    	public AutocompleteTextField(int col) {
+    		super(col);
+    		this.sugerencias= new ArrayList<String>();
+    		init();
+    	}
+    	
+    	public void setSugerencias(ArrayList<String> sugerencias) {
+    		this.sugerencias= sugerencias;
+    	}
+    	private void init() {
+    		//Estetica gris para simular autocompletado
+    		setSelectionColor(Color.WHITE);
+    		setSelectedTextColor(new Color(160,160,160));
+    		
+    		//Detectar si se borra texto
+    		addKeyListener(new KeyAdapter() {
+    			@Override
+    			public void keyPressed(KeyEvent e) {
+    				isDeleting= (e.getKeyCode() == KeyEvent.VK_BACK_SPACE || e.getKeyCode() == KeyEvent.VK_DELETE);
+    			}
+    		});
+    	}
+    	/*
+    	 * Inicio GEMINI AI
+    	 */
+    	
+    	private String quitarTildes(String input) {
+    		if(input == null) {
+    			return "";
+    		}
+    		String normalized= Normalizer.normalize(input, Normalizer.Form.NFD);
+    		Pattern pattern= Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+    		return pattern.matcher(normalized).replaceAll("");
+    	}
+    	
+    	@Override
+    	protected javax.swing.text.Document createDefaultModel(){
+    		return new AutocompleteDocument();
+    	}
+    	
+    	private class AutocompleteDocument extends PlainDocument{
+    		@Override
+    		public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+    			if(sugerencias == null || sugerencias.isEmpty() || isDeleting) {
+    				super.insertString(offs, str, a);
+    				return;
+    			}
+    			
+    			super.insertString(offs, str, a);
+    			String content= getText(0, getLength());
+    			String contentClean= quitarTildes(content).toLowerCase();
+    			
+    			for(String sugerencia :  sugerencias) {
+    				String sugerenciaClean= quitarTildes(sugerencia).toLowerCase();
+    				if(sugerenciaClean.startsWith(contentClean)) {
+    					String parteSugerida= sugerencia.substring(content.length());
+    					super.insertString(getLength(), parteSugerida, a);
+    					setCaretPosition(getLength());
+    					moveCaretPosition(content.length());
+    					return;
+    					/*
+    					 * Fin GEMINI AI
+    					 */
+    				}
+    			}
+    		}
+    	}
     }
 }
