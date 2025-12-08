@@ -19,7 +19,7 @@ public class VentanaResumen extends JFrame {
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
 
-    // Etiquetas de los valores
+    // Etiquetas de los valore
     private JLabel lblNumeroReservaValor;
     private JLabel lblPrecioTotalValor;
     private JLabel lblFechaCompraValor;
