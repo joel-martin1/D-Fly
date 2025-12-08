@@ -1,9 +1,10 @@
 package gui;
-
+import java.time.LocalDate;
 import javax.swing.*;
 import java.awt.*;
 import domain.Vuelo;
 import domain.Usuario;
+import java.time.LocalDate; 
 import util.UIConstants;
 public class VentanaPago extends JFrame {
     private Vuelo vuelo;
@@ -145,8 +146,19 @@ public class VentanaPago extends JFrame {
                             VentanaPago.this,
                             "Pago realizado con éxito",
                             "Éxito",
+                            
                             JOptionPane.INFORMATION_MESSAGE
+                            
+                            
                         );
+                        //codigo para abrir ventana resumen, enviar datos relevantes
+                        String numReserva = "RES-" + System.currentTimeMillis(); 
+                        String fechaCompra = LocalDate.now().toString();
+                        
+                        VentanaResumen resumen = new VentanaResumen(vuelo, usuario, numReserva, fechaCompra);
+                        resumen.setVisible(true);
+                        dispose();
+                        
                     } else {
                         JOptionPane.showMessageDialog(
                             VentanaPago.this,

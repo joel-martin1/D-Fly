@@ -1,6 +1,7 @@
 package gui;
 
 //J frame importaciones
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;

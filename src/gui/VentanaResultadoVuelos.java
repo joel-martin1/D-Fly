@@ -134,6 +134,7 @@ BorderFactory.createLineBorder(UIConstants.DFLY,1),
                                          JOptionPane.WARNING_MESSAGE);
                                      
                                      // GUARDA el vuelo seleccionado para después
+                                     
                                      SesionManager.setVueloPendiente(vuelo);
                                      SesionManager.setOrigenPendiente(origen);
                                      SesionManager.setDestinoPendiente(destino);
@@ -146,6 +147,8 @@ BorderFactory.createLineBorder(UIConstants.DFLY,1),
                                  }
                                  
                                  // Si está logueado → PAGO DIRECTO
+                                 
+                                 
                                  VentanaPago ventanaPago = new VentanaPago(vuelo, SesionManager.getUsuario());
                                  ventanaPago.setVisible(true);
                                  dispose(); 
