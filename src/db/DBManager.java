@@ -83,6 +83,18 @@ public class DBManager {
 	            "    FOREIGN KEY(id_hotel) REFERENCES Hotel(id_hotel)" +
 	            ");";
 	    
+	    String sqlTarjeta=
+	    		"CREATE TABLE IF NOT EXISTS Tarjeta (" +
+	    	            "    id_tarjeta INTEGER PRIMARY KEY AUTOINCREMENT," +
+	    	            "    id_usuario INTEGER NOT NULL," +
+	    	            "    numero_tarjeta TEXT NOT NULL," +
+	    	            "    nombre_titular TEXT NOT NULL," +
+	    	            "    fecha_caducidad TEXT," +
+	    	            "    cvv INTEGER," +
+	    	            "    saldo REAL DEFAULT 0.0," +
+	    	            "    FOREIGN KEY(id_usuario) REFERENCES Usuario(id_usuario)" +
+	    	            ");";
+	    
 	    try(Connection conn= conectar();
 	    	Statement stmt= conn.createStatement()){
 	    	
@@ -91,6 +103,7 @@ public class DBManager {
 	    	stmt.execute(sqlVuelo);
 	    	stmt.execute(sqlHotel);
 	    	stmt.execute(sqlReserva);
+	    	stmt.execute(sqlTarjeta);
 	    	
 	    }catch(SQLException e) {
 	    	System.err.println("Error al crear las tablas: "+e.getMessage());
@@ -106,6 +119,7 @@ public class DBManager {
 			
 			// 1. Limpiar Tablas
             stmt.execute("DELETE FROM Reserva;");
+            stmt.execute("DELETE FROM Tarjeta;");
             stmt.execute("DELETE FROM Vuelo;");
             stmt.execute("DELETE FROM Hotel;");
             stmt.execute("DELETE FROM Destino;");
@@ -176,9 +190,7 @@ public class DBManager {
                 "(8, 'Sydney Opera View', 250.0);";    
             stmt.execute(sqlHoteles);
 
-            /*
-             * 6. Insertar RESERVAS (Datos históricos)
-             */
+          
             String sqlReservas=
                 "INSERT INTO Reserva (id_usuario, id_vuelo, id_hotel, fecha_reserva, precio_total_pagado) VALUES " +
                 "(2, 1, NULL, '2025-11-10 09:00', 950.0)," + 
@@ -187,6 +199,16 @@ public class DBManager {
                 "(2, 4, NULL, '2025-11-15 17:00', 600.0)," +
                 "(5, 10, 9, '2025-11-18 10:00', 430.0);"; // David compró vuelo a NY + hotel
             stmt.execute(sqlReservas);
+            
+            String sqlTarjetas = 
+                    "INSERT INTO Tarjeta (id_usuario, numero_tarjeta, nombre_titular, fecha_caducidad, cvv, saldo) VALUES " +
+                    "(2, '4545111122223333', 'ANA GARCIA', '12/28', 123, 5000.0)," +      // Ana (Tiene dinero)
+                    "(3, '5500999988887777', 'BRUNO SOLIS', '05/26', 456, 150.0)," +      // Bruno (Pobre, solo 150€)
+                    "(4, '4111222233334444', 'CARLA DIAZ', '01/30', 789, 10000.0)," +     // Carla (Rica)
+                    "(5, '3400123456789012', 'DAVID M', '09/27', 999, 2500.0);"+          // David (Normal)
+                    "(6, '7891236571027631', 'ELENA R, '09/30, 951, 4600.0);";
+            		
+                stmt.execute(sqlTarjetas);
             
             System.out.println("Datos masivos iniciales insertados correctamente.");
 			
