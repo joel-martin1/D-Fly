@@ -1,5 +1,4 @@
 package gui;
-
 import javax.swing.*;
 import domain.Vuelo;
 import domain.Destino;
@@ -148,8 +147,9 @@ BorderFactory.createLineBorder(UIConstants.DFLY,1),
                                  
                                  // Si está logueado → PAGO DIRECTO
                                  
-                                 
-                                 VentanaPago ventanaPago = new VentanaPago(vuelo, SesionManager.getUsuario());
+                                 String textoOrigen = origen.getCiudad();
+                                 String textoDestino = destino.getCiudad();
+                                 VentanaPago ventanaPago = new VentanaPago(vuelo, SesionManager.getUsuario(),textoOrigen,textoDestino);
                                  ventanaPago.setVisible(true);
                                  dispose(); 
                              }

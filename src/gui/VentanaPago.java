@@ -9,11 +9,15 @@ import util.UIConstants;
 public class VentanaPago extends JFrame {
     private Vuelo vuelo;
     private Usuario usuario;
-
+    private String ciudadOrigen;
+    private String ciudadDestino;
     // Constructor  (con vuelo y usuario)
-    public VentanaPago(Vuelo vuelo, Usuario usuario) {
+    public VentanaPago(Vuelo vuelo, Usuario usuario, String ciudadOrigen, String ciudadDestino) {
         this.vuelo = vuelo;
         this.usuario = usuario;
+        this.ciudadOrigen = ciudadOrigen;
+        this.ciudadDestino = ciudadDestino;
+        
         initComponents(); 
     }
 
@@ -151,11 +155,11 @@ public class VentanaPago extends JFrame {
                             
                             
                         );
-                        //codigo para abrir ventana resumen, enviar datos relevantes
+                        //codigo para abrir ventana resumen, enviar datos relevantes. incluido origen y destino
                         String numReserva = "RES-" + System.currentTimeMillis(); 
                         String fechaCompra = LocalDate.now().toString();
                         
-                        VentanaResumen resumen = new VentanaResumen(vuelo, usuario, numReserva, fechaCompra);
+                        VentanaResumen resumen = new VentanaResumen(vuelo, usuario, numReserva, fechaCompra, ciudadOrigen, ciudadDestino);
                         resumen.setVisible(true);
                         dispose();
                         
