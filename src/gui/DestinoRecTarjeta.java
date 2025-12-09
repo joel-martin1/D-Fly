@@ -63,7 +63,6 @@ public class DestinoRecTarjeta extends JPanel{
 		textPanel.add(lblPrecio);
 		add(textPanel, BorderLayout.SOUTH);
 		
-		//Efectos al poner el cursor encima
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -72,11 +71,6 @@ public class DestinoRecTarjeta extends JPanel{
 			@Override
 			public void mouseExited(MouseEvent e) {
 				setBackground(Color.WHITE);
-			}
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				//Esto abrira la ventana de la reserva con los datos de la reserva
-				JOptionPane.showMessageDialog(null, "Se ha pulsado "+nombre);
 			}
 		});
 	}

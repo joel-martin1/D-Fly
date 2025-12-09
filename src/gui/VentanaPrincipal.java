@@ -136,36 +136,25 @@ public class VentanaPrincipal extends JFrame {
         
         searchPanelCompleto.add(panelPestanas, BorderLayout.NORTH);
 
-       
-        
-     // Código NUEVO - Origen y Destino
-
-     // Panel de búsqueda con Origen y Destino
+        //Panel de búsqueda con Origen y Destino
         JPanel panelFormulario = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         panelFormulario.setOpaque(false);
 
-     // CAMPO DE ORIGEN 
         txtOrigen = new AutocompleteTextField(15);
         txtOrigen.setSugerencias(cargaDestinos.getNombresDestinos());
         panelFormulario.add(new JLabel("Origen:")).setForeground(Color.WHITE);
         panelFormulario.add(txtOrigen);
 
-     // CAMPO DE DESTINO
         txtDestino = new AutocompleteTextField(15);
         txtDestino.setSugerencias(cargaDestinos.getNombresDestinos());
         panelFormulario.add(new JLabel("Destino:")).setForeground(Color.WHITE);
         panelFormulario.add(txtDestino);
 
-     // RESTO DE CAMPOS (fechas, personas, etc.) 
         JComboBox<Integer> cbmDiaIda = new JComboBox<Integer>(); 
         JComboBox<String> cbmMesIda = new JComboBox<String>(); 
         JComboBox<Integer> cbmAnioIda = new JComboBox<Integer>(); 
 
-     
         int diaActual = LocalDate.now().getDayOfMonth();
-     
-
-        
         int mesActual= LocalDate.now().getMonthValue();
         
         //Rellenamos el JComboBox con todos los días
