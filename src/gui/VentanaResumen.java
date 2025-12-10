@@ -1,172 +1,134 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import java.awt.*;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
 import domain.Vuelo;
 import domain.Usuario;
+import domain.Hotel;
+import db.DBManager;
 import util.UIConstants;
+import main.SesionManager;
+import java.net.URL;
 
 public class VentanaResumen extends JFrame {
 
-    private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
 
-    private JLabel lblNumeroReservaValor;
-    private JLabel lblPrecioTotalValor;
-    private JLabel lblFechaCompraValor;
-    private JLabel lblNombrePasajeroValor;
-    private JLabel lblCorreoPasajeroValor;
-    private JLabel lblOrigenValor;
-    private JLabel lblDestinoValor;
-    private JLabel lblFechaVueloValor;
+	public VentanaResumen(Vuelo vuelo, Usuario usuario, String numReserva, String fechaCompra, String nombreOrigen, String nombreDestino) {
+		// Recuperamos el hotel si existe en la sesión
+		Hotel hotelSeleccionado = SesionManager.getHotelPendiente();
+		Integer idHotel = (hotelSeleccionado != null) ? hotelSeleccionado.getId() : null;
+		
+		// Insertamos la reserva
+		DBManager.insertarReserva(usuario.getId(), vuelo.getId(), idHotel, fechaCompra, vuelo.getPrecio());
 
+		setTitle("D-Fly | Resumen de Reserva");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setSize(500, 650); 
+		setLocationRelativeTo(null);
+		
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+		contentPane.setLayout(new BorderLayout());
+		contentPane.setBackground(Color.WHITE);
+		setContentPane(contentPane);
 
-    public VentanaResumen(Vuelo vuelo, Usuario usuario, String numReserva, String fechaCompra, String nombreOrigen, String nombreDestino) {
-        setTitle("D-Fly - Resumen de Reserva");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(600, 600);
-        setLocationRelativeTo(null); 
+		JPanel headerPanel = new JPanel(new BorderLayout());
+		headerPanel.setBackground(UIConstants.DFLY);
+		headerPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
 
-        contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-        contentPane.setLayout(new BorderLayout(0, 20));
-        contentPane.setBackground(Color.WHITE);
-        
-        setContentPane(contentPane);
+		JLabel logoLabel = new JLabel();
+		try {
+			URL imageUrl = getClass().getResource("/resources/LogoDFly_Morado.png");
+			if (imageUrl != null) {
+				ImageIcon originalIcon = new ImageIcon(imageUrl);
+				Image resizedImage = originalIcon.getImage().getScaledInstance(100, -1, Image.SCALE_SMOOTH);
+				logoLabel.setIcon(new ImageIcon(resizedImage));
+			} else {
+				logoLabel.setText("D-Fly");
+				logoLabel.setForeground(Color.WHITE);
+				logoLabel.setFont(new Font("Arial", Font.BOLD, 24));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		headerPanel.add(logoLabel, BorderLayout.WEST);
 
-        // banner
-        JPanel panelBanner = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        panelBanner.setBackground(UIConstants.DFLY); 
-        panelBanner.setBorder(new EmptyBorder(15, 0, 15, 0));
+		JLabel lblTitulo = new JLabel("¡RESERVA CONFIRMADA!");
+		lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
+		lblTitulo.setForeground(Color.WHITE);
+		lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
+		headerPanel.add(lblTitulo, BorderLayout.CENTER);
 
-        JLabel lblTitulo = new JLabel("¡RESERVA CONFIRMADA!");
-        lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 22));
-        lblTitulo.setForeground(Color.WHITE);
-        panelBanner.add(lblTitulo);
-        contentPane.add(panelBanner, BorderLayout.NORTH);
+		contentPane.add(headerPanel, BorderLayout.NORTH);
 
-        // panel info
-        JPanel panelInformacionWrapper = new JPanel(new BorderLayout());
-        panelInformacionWrapper.setBorder(new EmptyBorder(20, 40, 20, 40));
-        panelInformacionWrapper.setBackground(Color.WHITE);
-        contentPane.add(panelInformacionWrapper, BorderLayout.CENTER);
+		JPanel panelInfo = new JPanel(new GridLayout(0, 2, 10, 15));
+		panelInfo.setBorder(new EmptyBorder(20, 40, 20, 40));
+		panelInfo.setBackground(Color.WHITE);
+		contentPane.add(panelInfo, BorderLayout.CENTER);
 
-        JPanel panelInformacion = new JPanel();
-        panelInformacion.setLayout(new GridLayout(0, 2, 10, 15)); 
-        panelInformacion.setBackground(Color.WHITE);
-        panelInformacionWrapper.add(panelInformacion, BorderLayout.NORTH);
+		Font fLabel = new Font("Arial", Font.BOLD, 14);
+		Font fValue = new Font("Arial", Font.PLAIN, 14);
 
-        //fuente
-        Font labelFont = new Font("Arial", Font.BOLD, 14);
-        Font valueFont = new Font("Arial", Font.PLAIN, 14);
+		addFila(panelInfo, "Número de Reserva:", numReserva, fLabel, fValue);
+		addFila(panelInfo, "Fecha de Compra:", fechaCompra, fLabel, fValue);
+		panelInfo.add(new JLabel("")); panelInfo.add(new JLabel("")); 
+		
+		addFila(panelInfo, "Pasajero:", usuario.getNombre(), fLabel, fValue);
+		addFila(panelInfo, "Email:", usuario.getEmail(), fLabel, fValue);
+		panelInfo.add(new JLabel("")); panelInfo.add(new JLabel("")); 
 
-        // 1. Número de Reserva
-        JLabel lblNumeroReserva = new JLabel("Número de Reserva:");
-        lblNumeroReserva.setFont(labelFont);
-        panelInformacion.add(lblNumeroReserva);
-        
-        lblNumeroReservaValor = new JLabel(numReserva); 
-        lblNumeroReservaValor.setFont(valueFont);
-        lblNumeroReservaValor.setHorizontalAlignment(SwingConstants.RIGHT);
-        panelInformacion.add(lblNumeroReservaValor);
+		addFila(panelInfo, "Origen:", nombreOrigen, fLabel, fValue);
+		addFila(panelInfo, "Destino:", nombreDestino, fLabel, fValue);
+		addFila(panelInfo, "Fecha Vuelo:", vuelo.getFechaSalida(), fLabel, fValue);
+		
+		//Si hay hotel, lo mostramos
+		if (hotelSeleccionado != null) {
+			addFila(panelInfo, "Hotel:", hotelSeleccionado.getNombre(), fLabel, fValue);
+		}
+		
+		JLabel lblTotal = new JLabel("PRECIO TOTAL:");
+		lblTotal.setFont(new Font("Arial", Font.BOLD, 16));
+		lblTotal.setForeground(UIConstants.DFLY);
+		panelInfo.add(lblTotal);
+		
+		JLabel lblPrecio = new JLabel(String.format("%.2f €", vuelo.getPrecio()));
+		lblPrecio.setFont(new Font("Arial", Font.BOLD, 16));
+		lblPrecio.setHorizontalAlignment(SwingConstants.RIGHT);
+		panelInfo.add(lblPrecio);
 
-        // 2. Precio Total
-        JLabel lblPrecioTotal = new JLabel("Precio Total:");
-        lblPrecioTotal.setFont(labelFont);
-        panelInformacion.add(lblPrecioTotal);
-        
-        lblPrecioTotalValor = new JLabel(String.format("%.2f €", vuelo.getPrecio())); 
-        lblPrecioTotalValor.setFont(valueFont);
-        lblPrecioTotalValor.setHorizontalAlignment(SwingConstants.RIGHT);
-        panelInformacion.add(lblPrecioTotalValor);
+		JPanel panelBoton = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		panelBoton.setBackground(Color.WHITE);
+		panelBoton.setBorder(new EmptyBorder(0, 0, 20, 0));
+		
+		JButton btnCerrar = new JButton("Volver al Inicio");
+		btnCerrar.setFont(new Font("Arial", Font.BOLD, 14));
+		btnCerrar.setBackground(new Color(50, 50, 50));
+		btnCerrar.setForeground(Color.WHITE);
+		btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		
+		btnCerrar.addActionListener(e -> {
+			//Limpiamos sesión al terminar
+			SesionManager.setVueloPendiente(null);
+			SesionManager.setHotelPendiente(null);
+			SesionManager.setOrigenPendiente(null);
+			SesionManager.setDestinoPendiente(null);
+			
+			dispose();
+			new VentanaPrincipal().setVisible(true);
+		});
+		
+		panelBoton.add(btnCerrar);
+		contentPane.add(panelBoton, BorderLayout.SOUTH);
+	}
 
-        // 3. Fecha de Compra
-        JLabel lblFechaCompra = new JLabel("Fecha de Compra:");
-        lblFechaCompra.setFont(labelFont);
-        panelInformacion.add(lblFechaCompra);
-        
-        lblFechaCompraValor = new JLabel(fechaCompra); 
-        lblFechaCompraValor.setFont(valueFont);
-        lblFechaCompraValor.setHorizontalAlignment(SwingConstants.RIGHT);
-        panelInformacion.add(lblFechaCompraValor);
-
-        // Separador visual
-        panelInformacion.add(new JLabel("__________________________"));
-        panelInformacion.add(new JLabel("__________________________"));
-
-        // 4. Nombre del Pasajero
-        JLabel lblNombrePasajero = new JLabel("Pasajero Principal:");
-        lblNombrePasajero.setFont(labelFont);
-        panelInformacion.add(lblNombrePasajero);
-        
-        lblNombrePasajeroValor = new JLabel(usuario.getNombre()); 
-        lblNombrePasajeroValor.setFont(valueFont);
-        lblNombrePasajeroValor.setHorizontalAlignment(SwingConstants.RIGHT);
-        panelInformacion.add(lblNombrePasajeroValor);
-
-        // 5. Correo Electrónico
-        JLabel lblCorreo = new JLabel("Correo Electrónico:");
-        lblCorreo.setFont(labelFont);
-        panelInformacion.add(lblCorreo);
-        
-        lblCorreoPasajeroValor = new JLabel(usuario.getEmail()); 
-        lblCorreoPasajeroValor.setFont(valueFont);
-        lblCorreoPasajeroValor.setHorizontalAlignment(SwingConstants.RIGHT);
-        panelInformacion.add(lblCorreoPasajeroValor);
-
-        // 6. Origen
-        JLabel lblOrigen = new JLabel("Origen:");
-        lblOrigen.setFont(labelFont);
-        panelInformacion.add(lblOrigen);
-        
-        lblOrigenValor = new JLabel(nombreOrigen); 
-        lblOrigenValor.setFont(valueFont);
-        lblOrigenValor.setHorizontalAlignment(SwingConstants.RIGHT);
-        panelInformacion.add(lblOrigenValor);
-
-        // 7. Destino
-        JLabel lblDestino = new JLabel("Destino:");
-        lblDestino.setFont(labelFont);
-        panelInformacion.add(lblDestino);
-        
-        lblDestinoValor = new JLabel(nombreDestino); 
-        lblDestinoValor.setFont(valueFont);
-        lblDestinoValor.setHorizontalAlignment(SwingConstants.RIGHT);
-        panelInformacion.add(lblDestinoValor);
-
-        // 8. Fecha del Vuelo
-        JLabel lblFechaVuelo = new JLabel("Fecha del Vuelo:");
-        lblFechaVuelo.setFont(labelFont);
-        panelInformacion.add(lblFechaVuelo);
-        
-        lblFechaVueloValor = new JLabel(vuelo.getFechaSalida().toString()); 
-        lblFechaVueloValor.setFont(valueFont);
-        lblFechaVueloValor.setHorizontalAlignment(SwingConstants.RIGHT);
-        panelInformacion.add(lblFechaVueloValor);
-
-        // --- Botón Cerrar ---
-        JButton btnCerrar = new JButton("Cerrar");
-        btnCerrar.setFont(new Font("Arial", Font.BOLD, 14));
-        btnCerrar.addActionListener(e -> {
-            dispose();
-        });
-        
-        JPanel panelBoton = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        panelBoton.setBackground(Color.WHITE);
-        panelBoton.setBorder(new EmptyBorder(0, 0, 20, 0));
-        panelBoton.add(btnCerrar);
-        contentPane.add(panelBoton, BorderLayout.SOUTH);
-    }
+	private void addFila(JPanel p, String text, String val, Font f1, Font f2) {
+		JLabel l1 = new JLabel(text); l1.setFont(f1);
+		JLabel l2 = new JLabel(val); l2.setFont(f2);
+		l2.setHorizontalAlignment(SwingConstants.RIGHT);
+		p.add(l1); p.add(l2);
+	}
+	
 }

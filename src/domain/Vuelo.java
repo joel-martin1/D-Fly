@@ -31,5 +31,9 @@ public class Vuelo {
 }
     public double getPrecio() {return precio;}
     public String getAerolinea() {return aerolinea;}
+    
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
 
 }
