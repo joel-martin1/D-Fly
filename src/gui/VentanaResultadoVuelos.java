@@ -21,9 +21,9 @@ public class VentanaResultadoVuelos extends JFrame {
 	private Destino origen;
 	private Destino destino;
 	private int numDias; 
-    private boolean buscarHotel; // Variable para saber el modo (Vuelo vs Vuelo+Hotel)
+    private boolean buscarHotel; //Variable para saber el modo (Vuelo vs Vuelo+Hotel)
 
-	// Constructor actualizado con 'boolean buscarHotel'
+
 	public VentanaResultadoVuelos(List<Vuelo> vuelos, Destino origen, Destino destino, int numDias, boolean buscarHotel) {
 		this.vuelos = vuelos;
 		this.origen = origen;
@@ -38,7 +38,7 @@ public class VentanaResultadoVuelos extends JFrame {
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
-		// --- HEADER ---
+		//Header
 		JPanel headerPanel = new JPanel(new BorderLayout());
 		headerPanel.setBackground(UIConstants.DFLY);
 		headerPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
@@ -58,7 +58,6 @@ public class VentanaResultadoVuelos extends JFrame {
 		} catch (Exception e) { e.printStackTrace(); }
 		headerPanel.add(logoLabel, BorderLayout.WEST);
 
-		// Título informativo adaptativo
         String textoTitulo;
         if (buscarHotel) {
             textoTitulo = String.format("Paso 1: Vuelo (%d noches en destino)", numDias);
@@ -74,7 +73,7 @@ public class VentanaResultadoVuelos extends JFrame {
 
 		mainPanel.add(headerPanel, BorderLayout.NORTH);
 
-		// Botón Ordenar
+		//Botón Ordenar
 		JPanel panelBoton = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		panelBoton.setBackground(Color.WHITE);
 		panelBoton.setBorder(BorderFactory.createEmptyBorder(0, 30, 10, 30));
@@ -122,11 +121,8 @@ public class VentanaResultadoVuelos extends JFrame {
 
 	private void cargarVuelos() {
 		for (Vuelo vuelo : vuelos) {
-            // Lógica visual de precios
             double precioMostrar = vuelo.getPrecio();
             
-            // Si es modo Hotel+Vuelo, asumimos que mostramos el precio de Ida y Vuelta (x2)
-            // pero SIN sumar el hotel todavía.
             if (buscarHotel) {
                 precioMostrar = vuelo.getPrecio() * 2; 
             }
@@ -154,7 +150,6 @@ public class VentanaResultadoVuelos extends JFrame {
 			JLabel lblHorario = new JLabel("✈ Salida: " + vuelo.getFechaSalida());
 			tarjeta.add(lblHorario, gbc);
             
-            // Info adicional
             if (buscarHotel) {
                 gbc.gridy = 2;
                 JLabel lblInfo = new JLabel("(Precio Vuelo Ida/Vuelta. Hotel a elegir en siguiente paso)");
@@ -175,15 +170,14 @@ public class VentanaResultadoVuelos extends JFrame {
 
 			tarjeta.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
-                    // --- DECISIÓN DE FLUJO ---
 					if (buscarHotel) {
-                        // Vamos a la selección de hotel
+                        //Vamos a la selección de hotel
 					    VentanaSeleccionHotel ventanaHotel = new VentanaSeleccionHotel(
 							vuelo, origen, destino, numDias);
 					    ventanaHotel.setVisible(true);
 					    dispose(); 
                     } else {
-                        // Vamos a pagar
+                        //Vamos a pagar
                         gestionarPagoDirecto(vuelo);
                     }
 				}
@@ -194,7 +188,7 @@ public class VentanaResultadoVuelos extends JFrame {
 		}
 	}
     
-    // Método auxiliar
+
     private void gestionarPagoDirecto(Vuelo v) {
         if (!SesionManager.isLoggedIn()) {
             JOptionPane.showMessageDialog(this, "Inicia sesión para continuar", "Login", JOptionPane.WARNING_MESSAGE);

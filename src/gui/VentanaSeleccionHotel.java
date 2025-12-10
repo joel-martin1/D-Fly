@@ -110,15 +110,13 @@ public class VentanaSeleccionHotel extends JFrame {
             JLabel lblPrecioNoche = new JLabel(String.format("Precio/noche: %.2f €", hotel.getPrecioNoche()));
             tarjeta.add(lblPrecioNoche, gbc);
             
-            // Calculo Precio Total (Condicional si hay vuelo o no)
+            //Calculo Precio Total (Condicional si hay vuelo o no)
             double precioTotalPaquete;
             if (vueloSeleccionado != null) {
-                // Caso Vuelo + Hotel
                 double precioVuelos = vueloSeleccionado.getPrecio() * 2; 
                 double precioTotalHotel = hotel.getPrecioNoche() * numDias;
                 precioTotalPaquete = precioVuelos + precioTotalHotel;
             } else {
-                // Caso Solo Hotel
                 precioTotalPaquete = hotel.getPrecioNoche() * numDias;
             }
 
@@ -131,7 +129,7 @@ public class VentanaSeleccionHotel extends JFrame {
             tarjeta.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    // Si no hay vuelo (Solo Hotel), creamos uno ficticio para pasar datos al pago
+                    //Si no hay vuelo (Solo Hotel), creamos uno ficticio para pasar datos al pago
                     if (vueloSeleccionado == null) {
                         vueloSeleccionado = new Vuelo(0, 0, destino.getId_destino(), 
                                 java.time.LocalDate.now().toString(), "", 0, "Solo Alojamiento");
@@ -145,7 +143,7 @@ public class VentanaSeleccionHotel extends JFrame {
                         
                         SesionManager.setVueloPendiente(vueloSeleccionado);
                         SesionManager.setHotelPendiente(hotel);
-                        // Si es solo hotel, el origen puede ser null, usamos un dummy
+                        
                         if (origen != null) SesionManager.setOrigenPendiente(origen);
                         else SesionManager.setOrigenPendiente(new Destino(0,"-","-","","",0));
                         

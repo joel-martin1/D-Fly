@@ -49,8 +49,7 @@ public class VentanaPrincipal extends JFrame {
 		setLocationRelativeTo(null);
 		setLayout(new BorderLayout());
 		
-		getContentPane().setBackground(Color.WHITE); //Planeado que el fondo sea la foto de un avión
-
+		getContentPane().setBackground(Color.WHITE); 
 		JPanel panelSuperiorCompleto = new JPanel(new GridBagLayout()); 
 		GridBagConstraints gbcSuperior = new GridBagConstraints();
 		panelSuperiorCompleto.setBackground(Color.WHITE);
@@ -230,12 +229,11 @@ public class VentanaPrincipal extends JFrame {
 		
 		chkSoloIda.addActionListener(e -> {
 			boolean soloIda = chkSoloIda.isSelected();
-			// Deshabilitar campos fecha vuelta
+			//Deshabilitar campos fecha vuelta
 			cbmDiaVuelta.setEnabled(!soloIda);
 			cbmMesVuelta.setEnabled(!soloIda);
 			cbmAnioVuelta.setEnabled(!soloIda);
 			
-			// --- CAMBIO: Lógica de botones al marcar Solo Ida ---
 			if (soloIda) {
 				rbVuelo.setSelected(true);
 				rbAlojamiento.setEnabled(false);
@@ -254,16 +252,15 @@ public class VentanaPrincipal extends JFrame {
 		btnBuscar.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		btnBuscar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
-		// --- LÓGICA BOTÓN BUSCAR (MODIFICADA PARA 3 MODOS) ---
 		btnBuscar.addActionListener(e -> {
 			String ciudadOrigen = txtOrigen.getText().trim();
 			String ciudadDestino = txtDestino.getText().trim();
 			
-			// Detectar Modo
+			//Detectar Modo
 			boolean soloHotel = rbAlojamiento.isSelected();
 			boolean vueloMasHotel = rbAlojVuelo.isSelected();
 			
-			// Validación Básica
+			//Validación Básica
 			if (ciudadDestino.isEmpty()) {
 				JOptionPane.showMessageDialog(this, "El destino es obligatorio", "Aviso", JOptionPane.WARNING_MESSAGE);
 				return;
@@ -279,7 +276,7 @@ public class VentanaPrincipal extends JFrame {
 				return;
 			}
 			
-			// Obtener ID Destino
+			//Obtener ID Destino
 			int idDestino = DBManager.getDestinoIdByCiudad(ciudadDestino);
 			if (idDestino == -1) {
 				JOptionPane.showMessageDialog(this, "Destino no encontrado: " + ciudadDestino);
@@ -287,8 +284,8 @@ public class VentanaPrincipal extends JFrame {
 			}
 			Destino destinoObj = DBManager.getDestinoById(idDestino);
 			
-			// Calculo de Días
-			int dias = 1; // Por defecto 1 día para solo ida
+			//Calculo de Dias
+			int dias = 1; //Por defecto 1 día para solo ida
 			
 			if (!chkSoloIda.isSelected()) {
 				int dIda = (Integer) cbmDiaIda.getSelectedItem();
@@ -309,16 +306,14 @@ public class VentanaPrincipal extends JFrame {
 				dias = (int) diasCalc;
 			}
 
-			// --- MODO 1: SOLO HOTEL ---
 			if (soloHotel) {
-				// Abrimos selección de hotel directamente (sin vuelo)
+				//Abrimos selección de hotel directamente (sin vuelo)
 				VentanaSeleccionHotel vHotel = new VentanaSeleccionHotel(null, null, destinoObj, (int) dias);
 				vHotel.setVisible(true);
 				this.dispose();
 				return;
 			}
 			
-			// --- MODO 2 y 3: VUELOS ---
 			int idOrigen = DBManager.getDestinoIdByCiudad(ciudadOrigen);
 			if (idOrigen == -1) {
 				JOptionPane.showMessageDialog(this, "Origen no encontrado: " + ciudadOrigen);
@@ -333,7 +328,7 @@ public class VentanaPrincipal extends JFrame {
 			
 			List<Vuelo> vuelos = DBManager.buscarVuelos(idOrigen, idDestino, fecha + "%");
 			
-			// Pasamos el boolean 'vueloMasHotel' para que la siguiente ventana sepa qué hacer
+			//Pasamos el boolean 'vueloMasHotel' para la siguente ventana
 			VentanaResultadoVuelos ventana = new VentanaResultadoVuelos(vuelos, origenObj, destinoObj, (int) dias, vueloMasHotel);
 			ventana.setVisible(true);
 			this.dispose();

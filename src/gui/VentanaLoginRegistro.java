@@ -17,12 +17,8 @@ public class VentanaLoginRegistro extends JFrame {
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private CardLayout cardLayout;
-    
-    // Componentes Login
     private JTextField textUsuario;
     private JPasswordField pass;
-    
-    // Componentes Registro
     private JTextField textNombreUsuario;
     private JTextField textEmailRegistro;
     private JPasswordField passReg;
@@ -37,7 +33,7 @@ public class VentanaLoginRegistro extends JFrame {
         cardLayout = new CardLayout(0, 0);
         contentPane.setLayout(cardLayout);
 
-        // ============== PANEL DE LOGIN ==============
+        //Panel login
         JPanel PanelLogin = new JPanel();
         contentPane.add(PanelLogin, "LOGIN");
         PanelLogin.setLayout(new BorderLayout());
@@ -107,19 +103,19 @@ public class VentanaLoginRegistro extends JFrame {
                 String email = textUsuario.getText().trim();
                 String password = new String(pass.getPassword());
 
-                // Validaciones
+                //Validaciones
                 if (email.isEmpty() || password.isEmpty()) {
                     JOptionPane.showMessageDialog(VentanaLoginRegistro.this, "Rellene todos los campos", "Aviso", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
-                // Autenticación
+                //Autenticación
                 Usuario usuarioLogueado = DBManager.autenticarUsuario(email, password);
                 
                 if (usuarioLogueado != null) {
                     SesionManager.setUsuario(usuarioLogueado);
 
-                    // Redirección condicional (si venía de intentar comprar un vuelo)
+                    //Redirección condicional (si venía de intentar comprar un vuelo)
                     if (SesionManager.getVueloPendiente() != null) {
                         String origen = SesionManager.getOrigenPendiente().getCiudad();
                         String destino = SesionManager.getDestinoPendiente().getCiudad();
@@ -130,10 +126,10 @@ public class VentanaLoginRegistro extends JFrame {
                     } else {
                         //Logica admin-cliente
                         if ("ADMIN".equals(usuarioLogueado.getRol())) {
-                            // Abrir ventana de administración
+                            //Abrir ventana de administración
                             new VentanaAdmin().setVisible(true);
                         } else {
-                            // Abrir ventana principal normal
+                            //Abrir ventana principal normal
                             new VentanaPrincipal().setVisible(true);
                         }
                         dispose();
@@ -206,7 +202,7 @@ public class VentanaLoginRegistro extends JFrame {
                 String pass1 = new String(passReg.getPassword());
                 String pass2 = new String(passConfirmar.getPassword());
 
-                // Validaciones básicas
+                //Validaciones básicas
                 if (nombre.isEmpty() || email1.isEmpty() || pass1.isEmpty()) {
                     JOptionPane.showMessageDialog(VentanaLoginRegistro.this, "Rellene todos los campos", "Error", JOptionPane.WARNING_MESSAGE);
                     return;
@@ -216,13 +212,13 @@ public class VentanaLoginRegistro extends JFrame {
                     return;
                 }
 
-                // Registro
+                //Registro
                 boolean exito = DBManager.registrarNuevoCliente(nombre, email1, pass1);
                 if (exito) {
                     Usuario nuevoUsuario = DBManager.autenticarUsuario(email1, pass1);
                     SesionManager.setUsuario(nuevoUsuario);
 
-                    // Redirección post-registro
+                    //Redirección post-registro
                     if (SesionManager.getVueloPendiente() != null) {
                         String origen = SesionManager.getOrigenPendiente().getCiudad();
                         String destino = SesionManager.getDestinoPendiente().getCiudad();
@@ -246,7 +242,6 @@ public class VentanaLoginRegistro extends JFrame {
         panelFormularioRegistro.add(btnVolver, gbc1);
     }
     
-    // Helper para limpiar el código de constraints
     private GridBagConstraints setGBC(int x, int y) {
         GridBagConstraints g = new GridBagConstraints();
         g.gridx = x; g.gridy = y; g.insets = new Insets(6, 5, 6, 5);

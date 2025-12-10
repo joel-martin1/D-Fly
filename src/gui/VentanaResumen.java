@@ -17,11 +17,9 @@ public class VentanaResumen extends JFrame {
 	private JPanel contentPane;
 
 	public VentanaResumen(Vuelo vuelo, Usuario usuario, String numReserva, String fechaCompra, String nombreOrigen, String nombreDestino) {
-		// Recuperamos el hotel si existe en la sesión
 		Hotel hotelSeleccionado = SesionManager.getHotelPendiente();
 		Integer idHotel = (hotelSeleccionado != null) ? hotelSeleccionado.getId() : null;
 		
-		// Insertamos la reserva
 		DBManager.insertarReserva(usuario.getId(), vuelo.getId(), idHotel, fechaCompra, vuelo.getPrecio());
 
 		setTitle("D-Fly | Resumen de Reserva");

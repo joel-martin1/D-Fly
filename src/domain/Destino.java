@@ -1,4 +1,3 @@
-//TODO: Implementar un precio desde (será "algo" que recorra todos los precios posible de ese destino, y pondrá el mas barato)
 package domain;
 
 public class Destino {

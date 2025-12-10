@@ -117,7 +117,7 @@ public class DBManager {
 		try(Connection conn= conectar();
 			Statement stmt= conn.createStatement()) {
 			
-			// 1. Limpiar Tablas
+			//Limpiar Tablas
             stmt.execute("DELETE FROM Reserva;");
             stmt.execute("DELETE FROM Tarjeta;");
             stmt.execute("DELETE FROM Vuelo;");
@@ -149,7 +149,7 @@ public class DBManager {
                 "('Sídney', 'Australia', 'Aventura en Oceanía', '/resources/sydney.jpg');";      
             stmt.execute(sqlDestinos);
             
-            // Desde Donosti (1)
+            //Desde Donosti (1)
             stmt.execute("INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
                 "(1, 2, '2025-12-01 10:00', 950.0, 'D-Fly Air')," +
                 "(1, 3, '2025-12-05 08:00', 1200.0, 'Iberia')," +
@@ -157,7 +157,7 @@ public class DBManager {
                 "(1, 5, '2025-12-15 09:30', 150.0, 'British Airways')," +
                 "(1, 6, '2025-12-20 11:00', 120.0, 'Air France');");
 
-            // Desde Nueva York (2)
+            //Desde Nueva York (2)
             stmt.execute("INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
                 "(2, 1, '2025-12-02 14:00', 850.0, 'D-Fly Air')," +
                 "(2, 3, '2025-12-06 16:00', 1400.0, 'JAL')," +
@@ -165,7 +165,7 @@ public class DBManager {
                 "(2, 6, '2025-12-18 20:00', 550.0, 'Air France')," +
                 "(2, 8, '2025-12-22 08:00', 1600.0, 'Qantas');");
 
-            // Desde Tokio (3)
+            //Desde Tokio (3)
             stmt.execute("INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
                 "(3, 1, '2025-12-03 09:00', 1300.0, 'ANA')," +
                 "(3, 2, '2025-12-07 11:00', 1450.0, 'JAL')," +
@@ -173,7 +173,7 @@ public class DBManager {
                 "(3, 8, '2025-12-19 15:00', 850.0, 'Qantas')," +
                 "(3, 5, '2025-12-23 23:00', 1100.0, 'British Airways');");
 
-            // Desde Dubai (4)
+            //Desde Dubai (4)
             stmt.execute("INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
                 "(4, 1, '2025-12-04 07:00', 950.0, 'Emirates')," +
                 "(4, 2, '2025-12-08 22:00', 1200.0, 'Emirates')," +
@@ -181,7 +181,7 @@ public class DBManager {
                 "(4, 7, '2025-12-20 14:00', 600.0, 'Alitalia')," +
                 "(4, 8, '2025-12-24 16:00', 1300.0, 'Qantas');");
 
-            // Desde Londres (5)
+            //Desde Londres (5)
             stmt.execute("INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
                 "(5, 1, '2025-12-01 10:00', 180.0, 'Ryanair')," +
                 "(5, 2, '2025-12-05 12:00', 500.0, 'British Airways')," +
@@ -189,7 +189,7 @@ public class DBManager {
                 "(5, 7, '2025-12-15 16:00', 120.0, 'Alitalia')," +
                 "(5, 4, '2025-12-20 18:00', 550.0, 'Emirates');");
 
-            // Desde París (6)
+            //Desde París (6)
             stmt.execute("INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
                 "(6, 1, '2025-12-02 08:00', 110.0, 'Air France')," +
                 "(6, 2, '2025-12-06 10:00', 600.0, 'Air France')," +
@@ -197,7 +197,7 @@ public class DBManager {
                 "(6, 7, '2025-12-16 14:00', 95.0, 'Ryanair')," +
                 "(6, 3, '2025-12-21 20:00', 1050.0, 'JAL');");
 
-            // Desde Roma (7)
+            //Desde Roma (7)
             stmt.execute("INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
                 "(7, 1, '2025-12-03 09:00', 130.0, 'Alitalia')," +
                 "(7, 5, '2025-12-07 11:00', 110.0, 'Ryanair')," +
@@ -205,7 +205,7 @@ public class DBManager {
                 "(7, 4, '2025-12-17 15:00', 450.0, 'Emirates')," +
                 "(7, 2, '2025-12-22 17:00', 700.0, 'Alitalia');");
 
-            // Desde Sídney (8)
+            //Desde Sídney (8)
             stmt.execute("INSERT INTO Vuelo (id_origen, id_destino, fecha_salida, precio, aerolinea) VALUES " +
                 "(8, 2, '2025-12-04 06:00', 1700.0, 'Qantas')," +
                 "(8, 3, '2025-12-08 08:00', 900.0, 'ANA')," +
@@ -234,7 +234,7 @@ public class DBManager {
                 "(5, 10, 9, '2025-11-18 10:00', 430.0);"; 
             stmt.execute(sqlReservas);
             
-            String sqlTarjetas = 
+            String sqlTarjetas= 
                 "INSERT INTO Tarjeta (id_usuario, numero_tarjeta, nombre_titular, fecha_caducidad, cvv, saldo) VALUES " +
                 "(2, '4545111122223333', 'ANA GARCIA', '12/28', 123, 5000.0)," +       
                 "(3, '5500999988887777', 'BRUNO SOLIS', '05/26', 456, 150.0)," +       
@@ -328,7 +328,6 @@ public class DBManager {
 
 	public static List<Vuelo> buscarVuelos(int idOrigen, int idDestino, String fecha) {
 	    List<Vuelo> vuelos = new ArrayList<>();
-	    // Modificado para que busque solo por origen y destino (ignora fecha para que salgan resultados siempre en la demo)
 	    String sql = "SELECT * FROM Vuelo WHERE id_origen = ? AND id_destino = ?";
 	    
 	    try (Connection conn = conectar();
@@ -453,7 +452,6 @@ public class DBManager {
 	    }
 	}
 	
-	//Id de destino a partir de nombre
 	public static int obtenerIdDestinoPorNombre(String ciudad) {
 	    String sql = "SELECT id_destino FROM Destino WHERE ciudad = ?";
 	    
@@ -484,7 +482,7 @@ public class DBManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0.0; // Si no hay hotel, asumimos 0 coste
+        return 0.0; //Si no hay hotel
     }
 
     public static ArrayList<Hotel> getHotelesPorDestino(int idDestino) {
@@ -580,7 +578,7 @@ public class DBManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return 3; // ERROR TÉCNICO
+            return 3; //Error general
         }
     }
 }

@@ -30,18 +30,18 @@ public class VentanaPago extends JFrame {
 
 	private void initComponents() {
 		setTitle("D-Fly | Pago del vuelo");
-		setSize(500, 450); // Ajustado para que quepa el header
+		setSize(500, 450);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(null);
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
-		// --- HEADER (Diseño Ventana Principal) ---
+		//Header
 		JPanel headerPanel = new JPanel(new BorderLayout());
 		headerPanel.setBackground(UIConstants.DFLY);
 		headerPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
 
-		// Logo
+		//Logo
 		JLabel logoLabel = new JLabel();
 		try {
 			URL imageUrl = getClass().getResource("/resources/LogoDFly_Morado.png");
@@ -59,7 +59,7 @@ public class VentanaPago extends JFrame {
 		}
 		headerPanel.add(logoLabel, BorderLayout.WEST);
 
-		// Título Header
+		//Titulo
 		JLabel lblTituloHeader = new JLabel("MÉTODO DE PAGO");
 		lblTituloHeader.setFont(new Font("Segoe UI", Font.BOLD, 22));
 		lblTituloHeader.setForeground(Color.WHITE);
@@ -67,7 +67,6 @@ public class VentanaPago extends JFrame {
 		headerPanel.add(lblTituloHeader, BorderLayout.CENTER);
 
 		mainPanel.add(headerPanel, BorderLayout.NORTH);
-		// ----------------------------------------
 
 		JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -84,9 +83,7 @@ public class VentanaPago extends JFrame {
 		txtFecha = new JTextField();
 		txtCVV = new JTextField();
 
-		// -------------------------------------------
-
-		// Añadir componentes al panel
+		//Añadir componentes al panel
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		panel.add(new JLabel("Titular:"), gbc);
@@ -132,75 +129,73 @@ public class VentanaPago extends JFrame {
 
 		mainPanel.add(panel, BorderLayout.CENTER);
 		add(mainPanel);
-		// Lógica de Pago
-				btnPagar.addActionListener(e -> {
-					// 1. Recogemos los datos del formulario
-					String nombre = txtNombre.getText().trim();
-					String numero = txtNumero.getText().trim().replaceAll("\\s+", ""); 
-					String fecha = txtFecha.getText().trim();
-					String cvvStr = txtCVV.getText().trim();
 
-					// 2. Validaciones de formato
-					StringBuilder errores = new StringBuilder();
-					if (nombre.isEmpty()) errores.append("- Nombre vacío\n");
-					if (!numero.matches("\\d{16}")) errores.append("- El número debe tener 16 dígitos\n");
-					if (!fecha.matches("\\d{2}/\\d{2}")) errores.append("- Fecha inválida (MM/AA)\n");
-					if (!cvvStr.matches("\\d{3}")) errores.append("- El CVV debe tener 3 dígitos\n");
+			btnPagar.addActionListener(e -> {
+				String nombre = txtNombre.getText().trim();
+				String numero = txtNumero.getText().trim().replaceAll("\\s+", ""); 
+				String fecha = txtFecha.getText().trim();
+				String cvvStr = txtCVV.getText().trim();
 
-					if (errores.length() > 0) {
-						JOptionPane.showMessageDialog(this, "Errores de formato:\n" + errores, "Error", JOptionPane.WARNING_MESSAGE);
-						return;
-					}
+				StringBuilder errores = new StringBuilder();
+				if (nombre.isEmpty()) errores.append("- Nombre vacío\n");
+				if (!numero.matches("\\d{16}")) errores.append("- El número debe tener 16 dígitos\n");
+				if (!fecha.matches("\\d{2}/\\d{2}")) errores.append("- Fecha inválida (MM/AA)\n");
+				if (!cvvStr.matches("\\d{3}")) errores.append("- El CVV debe tener 3 dígitos\n");
 
-					// 3. Proceso de cobro con el servidor
-					new Thread(() -> {
-						SwingUtilities.invokeLater(() -> 
-							JOptionPane.showMessageDialog(VentanaPago.this, "Conectando con el banco...", 
-									"Procesando", JOptionPane.INFORMATION_MESSAGE)
-						);
+				if (errores.length() > 0) {
+					JOptionPane.showMessageDialog(this, "Errores de formato:\n" + errores, "Error", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
 
-						try { Thread.sleep(1500); } catch (InterruptedException ex) {}
+				//Proceso de cobro con el servidor
+				new Thread(() -> {
+					SwingUtilities.invokeLater(() -> 
+						JOptionPane.showMessageDialog(VentanaPago.this, "Conectando con el banco...", 
+								"Procesando", JOptionPane.INFORMATION_MESSAGE)
+					);
 
-						int cvv = Integer.parseInt(cvvStr);
-						
-						// Llamamos al nuevo método que verifica saldo y cobra
-						int resultadoPago = DBManager.realizarPago(usuario.getId(), nombre, numero, fecha, cvv, vuelo.getPrecio());
+					try { Thread.sleep(1500); } catch (InterruptedException ex) {}
 
-						SwingUtilities.invokeLater(() -> {
-							switch (resultadoPago) {
-								case 0: // ÉXITO
-									JOptionPane.showMessageDialog(VentanaPago.this, "¡Pago autorizado correctamente!", "Éxito",
-											JOptionPane.INFORMATION_MESSAGE);
+					int cvv = Integer.parseInt(cvvStr);
+					
+					//Llamamos al nuevo método que verifica saldo y cobra
+					int resultadoPago = DBManager.realizarPago(usuario.getId(), nombre, numero, fecha, cvv, vuelo.getPrecio());
 
-									String numReserva = "RES-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-									String fechaCompra = LocalDate.now().toString();
+					SwingUtilities.invokeLater(() -> {
+						switch (resultadoPago) {
+							case 0:
+								JOptionPane.showMessageDialog(VentanaPago.this, "¡Pago autorizado correctamente!", "Éxito",
+										JOptionPane.INFORMATION_MESSAGE);
 
-									VentanaResumen resumen = new VentanaResumen(vuelo, usuario, numReserva, fechaCompra,
-											ciudadOrigen, ciudadDestino);
-									resumen.setVisible(true);
-									dispose();
-									break;
-									
-								case 1: // DATOS MAL
-									JOptionPane.showMessageDialog(VentanaPago.this, 
-											"Tarjeta rechazada: Los datos introducidos no coinciden.", 
-											"Error de Autenticación", JOptionPane.ERROR_MESSAGE);
-									break;
-									
-								case 2: // NO HAY DINERO
-									JOptionPane.showMessageDialog(VentanaPago.this, 
-											"Operación denegada: SALDO INSUFICIENTE en la tarjeta.", 
-											"Fondos Insuficientes", JOptionPane.WARNING_MESSAGE);
-									break;
-									
-								default: // ERROR SQL
-									JOptionPane.showMessageDialog(VentanaPago.this, 
-											"Error de conexión con la base de datos.", 
-											"Error Técnico", JOptionPane.ERROR_MESSAGE);
-									break;
-							}
-						});
-					}).start();
-				});
+								String numReserva = "RES-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+								String fechaCompra = LocalDate.now().toString();
+
+								VentanaResumen resumen = new VentanaResumen(vuelo, usuario, numReserva, fechaCompra,
+										ciudadOrigen, ciudadDestino);
+								resumen.setVisible(true);
+								dispose();
+								break;
+								
+							case 1:
+								JOptionPane.showMessageDialog(VentanaPago.this, 
+										"Tarjeta rechazada: Los datos introducidos no coinciden.", 
+										"Error de Autenticación", JOptionPane.ERROR_MESSAGE);
+								break;
+								
+							case 2: 
+								JOptionPane.showMessageDialog(VentanaPago.this, 
+										"Operación denegada: SALDO INSUFICIENTE en la tarjeta.", 
+										"Fondos Insuficientes", JOptionPane.WARNING_MESSAGE);
+								break;
+								
+							default:
+								JOptionPane.showMessageDialog(VentanaPago.this, 
+										"Error de conexión con la base de datos.", 
+										"Error Técnico", JOptionPane.ERROR_MESSAGE);
+								break;
+						}
+					});
+				}).start();
+			});
 	}
 }

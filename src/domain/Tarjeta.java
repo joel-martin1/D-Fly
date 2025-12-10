@@ -3,9 +3,9 @@ package domain;
 public class Tarjeta {
     private int id_tarjeta;
     private int id_usuario;
-    private String numeroTarjeta; // String es mejor para tarjetas (no se hacen sumas con ellas)
+    private String numeroTarjeta;
     private String nombreTitular;
-    private String fechaCaducidad; // Formato MM/YY
+    private String fechaCaducidad;
     private int cvv;
     private double saldo;
 
@@ -43,7 +43,6 @@ public class Tarjeta {
 
     @Override
     public String toString() {
-        //Solo mostramos los últimos 4 dígitos
         String ultimosDigitos = numeroTarjeta.length() > 4 ? numeroTarjeta.substring(numeroTarjeta.length() - 4) : "****";
         return "Tarjeta terminada en *" + ultimosDigitos + " (" + saldo + "€)";
     }
